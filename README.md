@@ -1,4 +1,4 @@
-This library is used to integrate with the Canvas LMS.
+# This library is used to integrate with the Canvas LMS.
 
 example:
 ```
