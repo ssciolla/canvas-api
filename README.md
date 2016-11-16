@@ -1,6 +1,4 @@
-
-This function returns an object with all the exported functions,
-but has to be called with apiKey and apiUrl.
+This library is used to integrate with the Canvas LMS.
 
 example:
 ```
