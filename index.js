@@ -115,10 +115,35 @@ function listSubaccounts (parentAccountId) {
     .then(() => [].concat.apply([], result)) // flatten array
 }
 
+
+/**
+usage example:
+
+canvasApi.findCourse('ML1318HT161')
+  .then(result => console.log('course found', result))
+  .catch(e => { if (e.statusCode === 404) {
+    // not found
+    console.log('course not found')
+  } else {
+    // something else went wrong
+  } })
+*/
 function findCourse (sisCourseId) {
-  return listCourses().then(courses => {
-    // console.log(courses)
-    return courses.find(course => course.sis_course_id === sisCourseId) })
+  console.log('finding course')
+  const url = `${apiUrl}/courses/sis_course_id:${sisCourseId}`
+
+  console.log('url', url)
+  return rp({
+    url,
+    auth: {
+      'bearer': apiKey
+    },
+    method: 'GET',
+    resolveWithFullResponse: true,
+    headers: {
+      'content-type': 'application/json'
+    }
+  }).then(result => result.body)
 }
 
 function findUser (userName) {
@@ -145,6 +170,13 @@ function getCourse (unique_id) {
   return requestCanvas(`courses/sis_course_id:${unique_id}`)
 }
 
+/*
+This function returns an object with all the exported functions,
+but has to be called with apiKey and apiUrl.
+
+example:
+const canvasApi = require('./canvasApi')('http://my.canvas.api', 'my canvas key')
+*/
 
 module.exports = function init (_apiUrl, _apiKey) {
   apiUrl = _apiUrl
