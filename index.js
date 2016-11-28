@@ -115,7 +115,6 @@ function listSubaccounts (parentAccountId) {
     .then(() => [].concat.apply([], result)) // flatten array
 }
 
-
 /**
 usage example:
 
@@ -170,6 +169,26 @@ function getCourse (unique_id) {
   return requestCanvas(`courses/sis_course_id:${unique_id}`)
 }
 
+function sendCsvFile (filename, account=1) {
+  console.log('Ready to send CSV file: ' + filename)
+  var formData = {
+    attachment: [
+      fs.createReadStream(filename)
+    ]
+  }
+  return rp({
+    url: `${apiUrl}/accounts/${account}/sis_imports`,
+    auth: {
+      'bearer': apiKey
+    },
+    method: 'POST',
+    headers: {
+      'content-type': 'multipart/form-data'
+    },
+    formData
+  })
+}
+
 /*
 This function returns an object with all the exported functions,
 but has to be called with apiKey and apiUrl.
@@ -197,5 +216,7 @@ module.exports = function init (_apiUrl, _apiKey) {
     requestCanvas,
     listCourses,
     findCourse,
-    enrollUser}
+    enrollUser,
+    sendCsvFile
+  }
 }
