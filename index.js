@@ -161,8 +161,8 @@ function enrollUser (course, user, type) {
   return requestCanvas(`courses/${course.id}/enrollments `, 'POST', body)
 }
 
-function getUser (unique_id) {
-  return requestCanvas(`users/sis_login_id:${unique_id}`)
+function getUser (kth_id) {
+  return requestCanvas(`users/sis_user_id:${kth_id}`)
 }
 
 function getCourse (unique_id) {
