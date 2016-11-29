@@ -1,5 +1,6 @@
 const rp = require('request-promise')
 require('colors')
+const fs = require('fs')
 
 let apiKey, apiUrl, rootAccount
 
