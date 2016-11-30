@@ -23,6 +23,7 @@ function requestUrl (subUrl, method = 'GET', json) {
     auth: {
       'bearer': apiKey
     },
+    resolveWithFullResponse: true,
     method,
     json,
     headers: {
@@ -30,8 +31,7 @@ function requestUrl (subUrl, method = 'GET', json) {
     }
 
   })
-    .then(res => json ? res : JSON.parse(res),
-      e => Promise.reject(`an error occured in request canvas url: ${url}, data: ${JSON.stringify(json, null, 2)} ${e}`))
+    .then(res => json ? res : JSON.parse(res))
 }
 
 function getRootAccount () {
@@ -129,21 +129,24 @@ canvasApi.findCourse('ML1318HT161')
   } })
 */
 function findCourse (sisCourseId) {
-  console.log('finding course')
-  const url = `${apiUrl}/courses/sis_course_id:${sisCourseId}`
-
-  console.log('url', url)
-  return rp({
-    url,
-    auth: {
-      'bearer': apiKey
-    },
-    method: 'GET',
-    resolveWithFullResponse: true,
-    headers: {
-      'content-type': 'application/json'
-    }
-  }).then(result => result.body)
+  return requestCanvas(`courses/sis_course_id:${sisCourseId}`, 'GET', true)
+  .then(res => res.body)
+  // console.log('finding course..........')
+  // const url = `${apiUrl}/courses/sis_course_id:${sisCourseId}`
+  //
+  // console.log('url', url)
+  // return rp({
+  //   url,
+  //   auth: {
+  //     'bearer': apiKey
+  //   },
+  //   method: 'GET',
+  //   resolveWithFullResponse: true,
+  //   headers: {
+  //     'content-type': 'application/json'
+  //   }
+  // })
+  // .then(result => result.body)
 }
 
 function findUser (userName) {
@@ -201,8 +204,6 @@ const canvasApi = require('./canvasApi')('http://my.canvas.api', 'my canvas key'
 module.exports = function init (_apiUrl, _apiKey) {
   apiUrl = _apiUrl
   apiKey = _apiKey
-
-  rootAccount = getRootAccount()
 
   return {
     getUser,
