@@ -131,22 +131,6 @@ canvasApi.findCourse('ML1318HT161')
 function findCourse (sisCourseId) {
   return requestCanvas(`courses/sis_course_id:${sisCourseId}`, 'GET', true)
   .then(res => res.body)
-  // console.log('finding course..........')
-  // const url = `${apiUrl}/courses/sis_course_id:${sisCourseId}`
-  //
-  // console.log('url', url)
-  // return rp({
-  //   url,
-  //   auth: {
-  //     'bearer': apiKey
-  //   },
-  //   method: 'GET',
-  //   resolveWithFullResponse: true,
-  //   headers: {
-  //     'content-type': 'application/json'
-  //   }
-  // })
-  // .then(result => result.body)
 }
 
 function findUser (userName) {
