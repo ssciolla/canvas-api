@@ -189,6 +189,8 @@ module.exports = function init (_apiUrl, _apiKey) {
   apiUrl = _apiUrl
   apiKey = _apiKey
 
+  rootAccount = getRootAccount()
+
   return {
     getUser,
     getCourse,
