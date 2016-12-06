@@ -31,7 +31,7 @@ function requestUrl (subUrl, method = 'GET', json) {
     }
 
   })
-    .then(res => json ? res : JSON.parse(res))
+    .then(res => json ? res.body : JSON.parse(res.body))
 }
 
 function getRootAccount () {
