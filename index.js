@@ -34,6 +34,8 @@ function requestUrl (subUrl, method = 'GET', json) {
     .then(res => json ? res.body : JSON.parse(res.body))
     // dont log entire error since that includes the access token
     .catch(e => {
+      // Don't include everything in the error, since the request object
+      // contain the access token. And we do not wan´t to log that.
       const strippedError = new Error(e.message)
       strippedError.statusCode = e.statusCode
       strippedError.statusMessage = e.statusMessage
@@ -98,7 +100,7 @@ function createUser (user) {
 }
 
 function updateUser (user, id) {
-  return requestCanvas(`users/${id}`, 'PUT', {user})
+  return requestCanvas(`users/${id}`, 'PUT', user)
 }
 
 function createCourse (course, accountId) {
