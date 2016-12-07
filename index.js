@@ -95,7 +95,7 @@ function createUser (user) {
 }
 
 function updateUser (user, id) {
-  return requestCanvas(`users/${id}`, 'PUT', {user})
+  return requestCanvas(`users/${id}`, 'PUT', user)
 }
 
 function createCourse (course, accountId) {
