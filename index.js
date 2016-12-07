@@ -32,6 +32,10 @@ function requestUrl (subUrl, method = 'GET', json) {
 
   })
     .then(res => json ? res.body : JSON.parse(res.body))
+    // dont return entire error since that includes the access token
+    .catch(e => {
+      throw new Error(e.message)
+    })
 }
 
 function getRootAccount () {
