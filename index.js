@@ -95,6 +95,7 @@ function createUser (user) {
 }
 
 function updateUser (user, id) {
+  console.log(`updating user ${id} with data ${user}`)
   return requestCanvas(`users/${id}`, 'PUT', user)
 }
 
