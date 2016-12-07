@@ -32,9 +32,12 @@ function requestUrl (subUrl, method = 'GET', json) {
 
   })
     .then(res => json ? res.body : JSON.parse(res.body))
-    // dont return entire error since that includes the access token
+    // dont log entire error since that includes the access token
     .catch(e => {
-      throw new Error(e.message)
+      const strippedError = new Error(e.message)
+      strippedError.statusCode = e.statusCode
+      strippedError.statusMessage = e.statusMessage
+      throw strippedError
     })
 }
 
@@ -95,8 +98,7 @@ function createUser (user) {
 }
 
 function updateUser (user, id) {
-  console.log(`updating user ${id} with data ${user}`)
-  return requestCanvas(`users/${id}`, 'PUT', user)
+  return requestCanvas(`users/${id}`, 'PUT', {user})
 }
 
 function createCourse (course, accountId) {
