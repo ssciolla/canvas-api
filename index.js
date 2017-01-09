@@ -138,8 +138,7 @@ canvasApi.findCourse('ML1318HT161')
   } })
 */
 function findCourse (sisCourseId) {
-  return requestCanvas(`courses/sis_course_id:${sisCourseId}`, 'GET', true)
-  .then(res => res.body)
+  return requestCanvas(`courses/sis_course_id:${sisCourseId}`)
 }
 
 function findUser (userName) {
