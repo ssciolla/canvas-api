@@ -108,7 +108,7 @@ function updateUser (user, id) {
 }
 
 function createCourse (course, accountId) {
-  log.info(`Creating course ${JSON.stringify(course, null, 4)} with account ${accountId} in canvas`)  
+  log.info(`Creating course ${JSON.stringify(course, null, 4)} with account ${accountId} in canvas`)
   return requestCanvas(`accounts/${accountId}/courses`, 'POST', course)
 }
 
@@ -124,7 +124,7 @@ function listCourses () {
 function listSubaccounts (parentAccountId) {
   const result = []
   log.info(`Listing subaccounts in canvas`)
-  
+
   return rootAccount
     .then(accountId => recursePages(`${apiUrl}/accounts/${parentAccountId}/sub_accounts?per_page=100`, result))
     .then(() => [].concat.apply([], result)) // flatten array
@@ -148,7 +148,7 @@ function findCourse (sisCourseId) {
 }
 
 function findUser (userName) {
-  log.info(`Finding user with userName ${userName} in canvas`)  
+  log.info(`Finding user with userName ${userName} in canvas`)
   return requestCanvas(`search/recipients?search=${userName}`)
     .then(foundUsers => {
       if (foundUsers.length === 1) {
@@ -160,19 +160,28 @@ function findUser (userName) {
 }
 
 function enrollUser (course, user, type) {
-  log.info(`Enrolling user.id ${user.id} of type ${type} to course.id ${course.id} in canvas`) 
+  log.info(`Enrolling user.id ${user.id} of type ${type} to course.id ${course.id} in canvas`)
   const body = {enrollment: {'user_id': user.id, type, 'notify': true}}
   return requestCanvas(`courses/${course.id}/enrollments `, 'POST', body)
 }
 
 function getUser (kth_id) {
-  log.info(`Getting user with kth_id ${kth_id} in canvas`)    
+  log.info(`Getting user with kth_id ${kth_id} in canvas`)
   return requestCanvas(`users/sis_user_id:${kth_id}`)
 }
 
 function getCourse (unique_id) {
-  log.info(`Getting course with unique_id ${unique_id} in canvas`)  
+  log.info(`Getting course with unique_id ${unique_id} in canvas`)
   return requestCanvas(`courses/sis_course_id:${unique_id}`)
+}
+
+function getSisStatus(sisImportId) {
+  return getRootAccount()
+  .then(accountId =>requestCanvas(`accounts/${accountId}/sis_imports/${sisImportId}`))
+}
+
+function pollUntilSisComplete(sisImportId){
+  return Promise.resolve({1:2})
 }
 
 function sendCsvFile (filename, json=false,account=1, options={}) {
@@ -229,6 +238,8 @@ module.exports = function init (_apiUrl, _apiKey) {
     findCourse,
     enrollUser,
     sendCsvFile,
+    getSisStatus,
+    pollUntilSisComplete,
     get logger() {
       return log
     },
