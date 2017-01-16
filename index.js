@@ -180,8 +180,24 @@ function getSisStatus(sisImportId) {
   .then(accountId =>requestCanvas(`accounts/${accountId}/sis_imports/${sisImportId}`))
 }
 
-function pollUntilSisComplete(sisImportId){
-  return Promise.resolve({1:2})
+function pollUntilSisComplete(sisImportId, wait=100){
+  return new Promise((resolve, reject)=>{
+    getSisStatus(sisImportId)
+    .then(result=>{
+      log.info('progress:', result.progress)
+      if(result.progress === 100){
+        // csv complete
+        resolve(result)
+      }else{
+        log.info(`not yet complete, try again in ${wait/1000} seconds`)
+        // Not complete, wait and try again
+        setTimeout(()=>{
+          return pollUntilSisComplete(sisImportId, wait*2)
+          .then(result => resolve(result))
+        },wait)
+      }
+    })
+  })
 }
 
 function sendCsvFile (filename, json=false,account=1, options={}) {
