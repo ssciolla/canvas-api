@@ -1,8 +1,10 @@
 const rp = require('request-promise')
+const defaultLogger = require('kth-console-log')
 require('colors')
 const fs = require('fs')
 
 let apiKey, apiUrl, rootAccount
+var log = defaultLogger
 
 function requestCanvas (url, method = 'GET', data) {
   return requestUrl(url, method, data).then(result => {
@@ -17,7 +19,7 @@ function requestCanvas (url, method = 'GET', data) {
 function requestUrl (subUrl, method = 'GET', json) {
   const url = `${apiUrl}/${subUrl}`
 
-  console.log('url', url)
+  log.info(`Requesting url ${url}`)
   return rp({
     url,
     auth: {
@@ -78,7 +80,6 @@ function recursePages (url, out) {
       const nextPageHeader = arrayOfRelHeaders.filter(([urlTag, rel]) => /next/.test(rel))
       if (nextPageHeader && nextPageHeader.length && nextPageHeader[0].length) {
         const [[nextUrlTag]] = nextPageHeader
-        console.log('recurse',nextUrlTag.slice(1, nextUrlTag.length - 1))
         return recursePages(nextUrlTag.slice(1, nextUrlTag.length - 1), out)
       } else {
         return out
@@ -88,6 +89,7 @@ function recursePages (url, out) {
 
 function listUsers () {
   const result = []
+  log.info(`Listing users in canvas`)
   return rootAccount
     .then(accountId => recursePages(`${apiUrl}/accounts/${accountId}/users?per_page=100`, result))
     .then(users => [].concat.apply([], users)) // flatten array
@@ -96,23 +98,23 @@ function listUsers () {
 function createUser (user) {
   return rootAccount
     .then(accountId => {
-      console.log('requestCanvas', user)
+      log.info(`Creating user ${user} in canvas`)
       return requestCanvas(`accounts/${accountId}/users`, 'POST', user) })
 }
 
 function updateUser (user, id) {
+  log.info(`Updating user ${user} with id ${id} in canvas`)
   return requestCanvas(`users/${id}`, 'PUT', user)
 }
 
 function createCourse (course, accountId) {
-  console.log(`creating course
-${JSON.stringify(course, null, 4)}
-    on account ${accountId}`)
+  log.info(`Creating course ${JSON.stringify(course, null, 4)} with account ${accountId} in canvas`)  
   return requestCanvas(`accounts/${accountId}/courses`, 'POST', course)
 }
 
 function listCourses () {
   const result = []
+  log.info(`Listing courses in canvas`)
 
   return rootAccount
     .then(accountId => recursePages(`${apiUrl}/accounts/${accountId}/courses?per_page=100`, result))
@@ -121,6 +123,8 @@ function listCourses () {
 
 function listSubaccounts (parentAccountId) {
   const result = []
+  log.info(`Listing subaccounts in canvas`)
+  
   return rootAccount
     .then(accountId => recursePages(`${apiUrl}/accounts/${parentAccountId}/sub_accounts?per_page=100`, result))
     .then(() => [].concat.apply([], result)) // flatten array
@@ -139,10 +143,12 @@ canvasApi.findCourse('ML1318HT161')
   } })
 */
 function findCourse (sisCourseId) {
+  log.info(`Finding course with sisCourseId ${sisCourseId} in canvas`)
   return requestCanvas(`courses/sis_course_id:${sisCourseId}`)
 }
 
 function findUser (userName) {
+  log.info(`Finding user with userName ${userName} in canvas`)  
   return requestCanvas(`search/recipients?search=${userName}`)
     .then(foundUsers => {
       if (foundUsers.length === 1) {
@@ -154,28 +160,31 @@ function findUser (userName) {
 }
 
 function enrollUser (course, user, type) {
+  log.info(`Enrolling user.id ${user.id} of type ${type} to course.id ${course.id} in canvas`) 
   const body = {enrollment: {'user_id': user.id, type, 'notify': true}}
   return requestCanvas(`courses/${course.id}/enrollments `, 'POST', body)
 }
 
 function getUser (kth_id) {
+  log.info(`Getting user with kth_id ${kth_id} in canvas`)    
   return requestCanvas(`users/sis_user_id:${kth_id}`)
 }
 
 function getCourse (unique_id) {
+  log.info(`Getting course with unique_id ${unique_id} in canvas`)  
   return requestCanvas(`courses/sis_course_id:${unique_id}`)
 }
 
 function sendCsvFile (filename, json=false,account=1, options={}) {
   const {batchMode, batchTerm} = options
-  console.log('Ready to send CSV file: ' + filename, batchMode, batchTerm)
+  log.info('Ready to send CSV file: ' + filename, batchMode, batchTerm)
   var formData = {
     attachment: [
       fs.createReadStream(filename)
     ]
   }
   const url = `${apiUrl}/accounts/${account}/sis_imports${batchMode?'?batch_mode=1':''}${batchTerm?'&batch_mode_term_id='+batchTerm:''}`
-  console.log('url', url)
+  log.info('url', url)
 
   return rp({
     url,
@@ -219,6 +228,12 @@ module.exports = function init (_apiUrl, _apiKey) {
     listCourses,
     findCourse,
     enrollUser,
-    sendCsvFile
+    sendCsvFile,
+    get logger() {
+      return log
+    },
+    set logger(logger) {
+      log = logger
+    }
   }
 }
