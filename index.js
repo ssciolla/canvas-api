@@ -78,6 +78,7 @@ function recursePages (url, out) {
       const nextPageHeader = arrayOfRelHeaders.filter(([urlTag, rel]) => /next/.test(rel))
       if (nextPageHeader && nextPageHeader.length && nextPageHeader[0].length) {
         const [[nextUrlTag]] = nextPageHeader
+        console.log('recurse',nextUrlTag.slice(1, nextUrlTag.length - 1))
         return recursePages(nextUrlTag.slice(1, nextUrlTag.length - 1), out)
       } else {
         return out
@@ -165,15 +166,19 @@ function getCourse (unique_id) {
   return requestCanvas(`courses/sis_course_id:${unique_id}`)
 }
 
-function sendCsvFile (filename, account=1) {
-  console.log('Ready to send CSV file: ' + filename)
+function sendCsvFile (filename, json=false,account=1, options={}) {
+  const {batchMode, batchTerm} = options
+  console.log('Ready to send CSV file: ' + filename, batchMode, batchTerm)
   var formData = {
     attachment: [
       fs.createReadStream(filename)
     ]
   }
+  const url = `${apiUrl}/accounts/${account}/sis_imports${batchMode?'?batch_mode=1':''}${batchTerm?'&batch_mode_term_id='+batchTerm:''}`
+  console.log('url', url)
+
   return rp({
-    url: `${apiUrl}/accounts/${account}/sis_imports`,
+    url,
     auth: {
       'bearer': apiKey
     },
@@ -181,7 +186,8 @@ function sendCsvFile (filename, account=1) {
     headers: {
       'content-type': 'multipart/form-data'
     },
-    formData
+    formData,
+    json
   })
 }
 
