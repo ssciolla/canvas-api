@@ -175,6 +175,12 @@ function getCourse (unique_id) {
   return requestCanvas(`courses/sis_course_id:${unique_id}`)
 }
 
+function getEnrollments (courseId) {
+  log.info(`Getting enrollments for course with unique_id ${courseId} in canvas`)
+
+  return requestCanvas(`courses/${courseId}/enrollments`)
+}
+
 function getSisStatus(sisImportId) {
   return getRootAccount()
   .then(accountId =>requestCanvas(`accounts/${accountId}/sis_imports/${sisImportId}`))
@@ -255,6 +261,7 @@ module.exports = function init (_apiUrl, _apiKey) {
     enrollUser,
     sendCsvFile,
     getSisStatus,
+    getEnrollments,
     pollUntilSisComplete,
     get logger() {
       return log
