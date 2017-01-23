@@ -1,6 +1,6 @@
 {
   "name": "canvas-api",
-  "version": "2.12.0",
+  "version": "3.0.0",
   "description": " Functions for communicating with Canvas LMS",
   "main": "index.js",
   "scripts": {
