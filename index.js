@@ -10,7 +10,8 @@ This returns an object with all the exported functions,
 but has to be called with apiKey and apiUrl.
 
 example:
-const canvasApi = require('./canvasApi')('http://my.canvas.api', 'my canvas key')
+const CanvasApi = require('./canvasApi')
+const canvasApi = new CanvasApi('http://my.canvas.api', 'my canvas key')
 */
 class CanvasApi{
   constructor(_apiUrl, _apiKey) {
@@ -23,6 +24,10 @@ class CanvasApi{
   }
   get logger() {
     return log
+  }
+
+  get rootAccount(){
+    return this.getRootAccount()
   }
 
   requestCanvas (url, method = 'GET', data) {
@@ -100,7 +105,7 @@ class CanvasApi{
         const nextPageHeader = arrayOfRelHeaders.filter(([urlTag, rel]) => /next/.test(rel))
         if (nextPageHeader && nextPageHeader.length && nextPageHeader[0].length) {
           const [[nextUrlTag]] = nextPageHeader
-          return recursePages(nextUrlTag.slice(1, nextUrlTag.length - 1), out)
+          return this.recursePages(nextUrlTag.slice(1, nextUrlTag.length - 1), out)
         } else {
           return out
         }
@@ -111,7 +116,7 @@ class CanvasApi{
     const result = []
     log.info(`Listing users in canvas`)
     return this.rootAccount
-      .then(accountId => recursePages(`${this.apiUrl}/accounts/${accountId}/users?per_page=100`, result))
+      .then(accountId => this.recursePages(`${this.apiUrl}/accounts/${accountId}/users?per_page=100`, result))
       .then(users => [].concat.apply([], users)) // flatten array
   }
 
@@ -119,7 +124,7 @@ class CanvasApi{
     return this.rootAccount
       .then(accountId => {
         log.info(`Creating user ${user} in canvas`)
-        return requestCanvas(`accounts/${accountId}/users`, 'POST', user) })
+        return this.requestCanvas(`accounts/${accountId}/users`, 'POST', user) })
   }
 
   updateUser (user, id) {
@@ -137,7 +142,7 @@ class CanvasApi{
     log.info(`Listing courses in canvas`)
 
     return this.rootAccount
-      .then(accountId => recursePages(`${this.apiUrl}/accounts/${accountId}/courses?per_page=100`, result))
+      .then(accountId => this.recursePages(`${this.apiUrl}/accounts/${accountId}/courses?per_page=100`, result))
       .then(() => [].concat.apply([], result)) // flatten array
   }
 
@@ -146,7 +151,7 @@ class CanvasApi{
     log.info(`Listing subaccounts in canvas`)
 
     return this.rootAccount
-      .then(accountId => recursePages(`${this.apiUrl}/accounts/${parentAccountId}/sub_accounts?per_page=100`, result))
+      .then(accountId => this.recursePages(`${this.apiUrl}/accounts/${parentAccountId}/sub_accounts?per_page=100`, result))
       .then(() => [].concat.apply([], result)) // flatten array
   }
 
@@ -218,7 +223,7 @@ class CanvasApi{
           log.info(`not yet complete, try again in ${wait/1000} seconds`)
           // Not complete, wait and try again
           setTimeout(()=>{
-            return pollUntilSisComplete(sisImportId, wait*2)
+            return this.pollUntilSisComplete(sisImportId, wait*2)
             .then(result => resolve(result))
           },wait)
         }
