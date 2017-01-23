@@ -111,7 +111,7 @@ class CanvasApi{
     const result = []
     log.info(`Listing users in canvas`)
     return this.rootAccount
-      .then(accountId => recursePages(`${apiUrl}/accounts/${accountId}/users?per_page=100`, result))
+      .then(accountId => recursePages(`${this.apiUrl}/accounts/${accountId}/users?per_page=100`, result))
       .then(users => [].concat.apply([], users)) // flatten array
   }
 
@@ -137,7 +137,7 @@ class CanvasApi{
     log.info(`Listing courses in canvas`)
 
     return this.rootAccount
-      .then(accountId => recursePages(`${apiUrl}/accounts/${accountId}/courses?per_page=100`, result))
+      .then(accountId => recursePages(`${this.apiUrl}/accounts/${accountId}/courses?per_page=100`, result))
       .then(() => [].concat.apply([], result)) // flatten array
   }
 
@@ -146,7 +146,7 @@ class CanvasApi{
     log.info(`Listing subaccounts in canvas`)
 
     return this.rootAccount
-      .then(accountId => recursePages(`${apiUrl}/accounts/${parentAccountId}/sub_accounts?per_page=100`, result))
+      .then(accountId => recursePages(`${this.apiUrl}/accounts/${parentAccountId}/sub_accounts?per_page=100`, result))
       .then(() => [].concat.apply([], result)) // flatten array
   }
 
@@ -203,7 +203,7 @@ class CanvasApi{
 
   getSisStatus(sisImportId) {
     return this.getRootAccount()
-    .then(accountId =>requestCanvas(`accounts/${accountId}/sis_imports/${sisImportId}`))
+    .then(accountId =>this.requestCanvas(`accounts/${accountId}/sis_imports/${sisImportId}`))
   }
 
   pollUntilSisComplete(sisImportId, wait=100){
@@ -234,7 +234,7 @@ class CanvasApi{
         fs.createReadStream(filename)
       ]
     }
-    const url = `${apiUrl}/accounts/${account}/sis_imports${batchMode?'?batch_mode=1':''}${batchTerm?'&batch_mode_term_id='+batchTerm:''}`
+    const url = `${this.apiUrl}/accounts/${account}/sis_imports${batchMode?'?batch_mode=1':''}${batchTerm?'&batch_mode_term_id='+batchTerm:''}`
     log.info('url', url)
 
     return rp({
