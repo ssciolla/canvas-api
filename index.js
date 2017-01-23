@@ -3,7 +3,6 @@ const defaultLogger = require('kth-console-log')
 require('colors')
 const fs = require('fs')
 
-let apiKey, apiUrl, rootAccount
 var log = defaultLogger
 
 /*
@@ -16,7 +15,7 @@ const canvasApi = require('./canvasApi')('http://my.canvas.api', 'my canvas key'
 class CanvasApi{
   constructor(_apiUrl, _apiKey) {
     this.apiUrl = _apiUrl
-    this.apiKey = apiKey
+    this.apiKey = _apiKey
   }
   set logger(logger) {
     log.info('overriding logger for canvasApi')
@@ -37,13 +36,14 @@ class CanvasApi{
   }
 
   requestUrl (subUrl, method = 'GET', json) {
-    const url = `${apiUrl}/${subUrl}`
+    const url = `${this.apiUrl}/${subUrl}`
 
     log.info(`Requesting url ${url}`)
+
     return rp({
       url,
       auth: {
-        'bearer': apiKey
+        'bearer': this.apiKey
       },
       resolveWithFullResponse: true,
       method,
@@ -83,7 +83,7 @@ class CanvasApi{
           return {body, headers: response.headers} },
         url,
         auth: {
-          'bearer': apiKey
+          'bearer': this.apiKey
         },
         headers: {
           'content-type': 'application/json'
@@ -240,7 +240,7 @@ class CanvasApi{
     return rp({
       url,
       auth: {
-        'bearer': apiKey
+        'bearer': this.apiKey
       },
       method: 'POST',
       headers: {
