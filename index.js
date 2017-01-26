@@ -17,6 +17,15 @@ class CanvasApi{
   constructor(_apiUrl, _apiKey) {
     this.apiUrl = _apiUrl
     this.apiKey = _apiKey
+
+    this.listSubaccounts = parentAccountId => {
+      const result = []
+      log.info(`Listing subaccounts in canvas`)
+
+      return this.rootAccount
+        .then(accountId => this.recursePages(`${this.apiUrl}/accounts/${parentAccountId}/sub_accounts?per_page=100`, result))
+        .then(() => [].concat.apply([], result)) // flatten array
+    }
   }
   set logger(logger) {
     log.info('overriding logger for canvasApi')
@@ -143,15 +152,6 @@ class CanvasApi{
 
     return this.rootAccount
       .then(accountId => this.recursePages(`${this.apiUrl}/accounts/${accountId}/courses?per_page=100`, result))
-      .then(() => [].concat.apply([], result)) // flatten array
-  }
-
-  listSubaccounts (parentAccountId) {
-    const result = []
-    log.info(`Listing subaccounts in canvas`)
-
-    return this.rootAccount
-      .then(accountId => this.recursePages(`${this.apiUrl}/accounts/${parentAccountId}/sub_accounts?per_page=100`, result))
       .then(() => [].concat.apply([], result)) // flatten array
   }
 
