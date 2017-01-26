@@ -1,6 +1,6 @@
 {
   "name": "kth-canvas-api",
-  "version": "3.2.0",
+  "version": "0.1.0",
   "description": " Functions for communicating with Canvas LMS",
   "main": "index.js",
   "scripts": {
@@ -15,7 +15,6 @@
     "kth-console-log": "1.x"
   },
   "devDependencies": {
-    "console-stamp": "^0.2.4",
     "tape": "^4.6.3",
     "tap-spec": "^4.1.1"
   }
