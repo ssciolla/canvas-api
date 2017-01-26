@@ -81,7 +81,7 @@ class CanvasApi{
   }
 
   recursePages (url, out) {
-    function _getPage (url) {
+    const _getPage = url => {
       console.log('get page'.yellow, url)
       return rp({
         transform: (body, response) => {
