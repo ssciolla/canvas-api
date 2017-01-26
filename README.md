@@ -2,6 +2,7 @@
 
 example:
 ```
-const canvasApi = require('canvas-api')('http://my.canvas.api', 'my canvas key')
+const CanvasApi = require('canvas-api')
+const canvasApi = new CanvasApi('http://my.canvas.api', 'my canvas key')
 canvasApi.listAccounts().then(accounts => console.log(accounts))
 ```
