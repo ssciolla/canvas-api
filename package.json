@@ -4,7 +4,8 @@
   "description": " Functions for communicating with Canvas LMS",
   "main": "index.js",
   "scripts": {
-    "test": "tape \"test/**/*.js\" | tap-spec"
+    "test": "tape \"test/**/*.js\" | tap-spec",
+    "postversion": "git push && git push --tags && npm publish"
   },
   "author": "emilsten@kth.se",
   "license": "MIT",
@@ -14,8 +15,12 @@
     "request-promise": "^4.1.1",
     "kth-console-log": "1.x"
   },
+  "pre-push": [
+    "test"
+  ],
   "devDependencies": {
-    "tape": "^4.6.3",
-    "tap-spec": "^4.1.1"
+    "pre-push": "^0.1.1",
+    "tap-spec": "^4.1.1",
+    "tape": "^4.6.3"
   }
 }
