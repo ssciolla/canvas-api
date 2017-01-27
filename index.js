@@ -18,6 +18,15 @@ class CanvasApi{
     this.apiUrl = _apiUrl
     this.apiKey = _apiKey
 
+    this.listCourses  = () => {
+      const result = []
+      log.info(`Listing courses in canvas`)
+
+      return this.rootAccount
+        .then(accountId => this.recursePages(`${this.apiUrl}/accounts/${accountId}/courses?per_page=100`, result))
+        .then(() => [].concat.apply([], result)) // flatten array
+    }
+
     this.listSubaccounts = parentAccountId => {
       const result = []
       log.info(`Listing subaccounts in canvas`)
@@ -144,15 +153,6 @@ class CanvasApi{
   createCourse (course, accountId) {
     log.info(`Creating course ${JSON.stringify(course, null, 4)} with account ${accountId} in canvas`)
     return this.requestCanvas(`accounts/${accountId}/courses`, 'POST', course)
-  }
-
-  listCourses () {
-    const result = []
-    log.info(`Listing courses in canvas`)
-
-    return this.rootAccount
-      .then(accountId => this.recursePages(`${this.apiUrl}/accounts/${accountId}/courses?per_page=100`, result))
-      .then(() => [].concat.apply([], result)) // flatten array
   }
 
   /**
