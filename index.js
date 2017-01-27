@@ -146,7 +146,7 @@ class CanvasApi{
   }
 
   updateUser (user, id) {
-    log.info(`Updating user ${user} with id ${id} in canvas`)
+    log.info(`Updating user ${JSON.stringify(user)} with id ${id} in canvas`)
     return this.requestCanvas(`users/${id}`, 'PUT', user)
   }
 
