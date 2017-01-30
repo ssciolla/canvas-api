@@ -90,7 +90,7 @@ class CanvasApi {
 
   getRootAccount () {
     return this.listAccounts()
-            .then(accounts => accounts.find(account => account.name === 'KTH Royal Institute of Technology' && account.workflow_state == 'active'))
+            .then(accounts => accounts.find(account => account.name === 'KTH Royal Institute of Technology' && account.workflow_state === 'active'))
             .then(account => account.id)
   }
 
@@ -102,8 +102,11 @@ class CanvasApi {
     const _getPage = url => {
       console.log('get page'.yellow, url)
       return rp({
-        transform: (body, response) => {
-          return {body, headers: response.headers} },
+        transform: (body, {headers}) => {
+          return {
+            body,
+            headers
+          } },
         url,
         auth: {
           'bearer': this.apiKey
@@ -142,7 +145,8 @@ class CanvasApi {
     return this.rootAccount
       .then(accountId => {
         log.info(`Creating user ${user} in canvas`)
-        return this.requestCanvas(`accounts/${accountId}/users`, 'POST', user) })
+        return this.requestCanvas(`accounts/${accountId}/users`, 'POST', user)
+      })
   }
 
   updateUser (user, id) {
@@ -190,14 +194,14 @@ class CanvasApi {
     return this.requestCanvas(`courses/${course.id}/enrollments `, 'POST', body)
   }
 
-  getUser (kth_id) {
-    log.info(`Getting user with kth_id ${kth_id} in canvas`)
-    return this.requestCanvas(`users/sis_user_id:${kth_id}`)
+  getUser (sisUserId) {
+    log.info(`Getting user with sisUserId ${sisUserId} in canvas`)
+    return this.requestCanvas(`users/sis_user_id:${sisUserId}`)
   }
 
-  getCourse (unique_id) {
-    log.info(`Getting course with unique_id ${unique_id} in canvas`)
-    return this.requestCanvas(`courses/sis_course_id:${unique_id}`)
+  getCourse (courseId) {
+    log.info(`Getting course with courseId ${courseId} in canvas`)
+    return this.requestCanvas(`courses/sis_course_id:${courseId}`)
   }
 
   getEnrollments (courseId) {
