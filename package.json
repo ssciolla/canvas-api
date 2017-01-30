@@ -11,10 +11,9 @@
   "author": "emilsten@kth.se",
   "license": "MIT",
   "dependencies": {
-    "colors": "^1.1.2",
+    "kth-console-log": "1.x",
     "request": "^2.78.0",
-    "request-promise": "^4.1.1",
-    "kth-console-log": "1.x"
+    "request-promise": "^4.1.1"
   },
   "pre-push": [
     "codecheck",

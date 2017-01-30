@@ -1,6 +1,5 @@
 const rp = require('request-promise')
 const defaultLogger = require('kth-console-log')
-require('colors')
 const fs = require('fs')
 
 var log = defaultLogger
@@ -100,7 +99,7 @@ class CanvasApi {
 
   recursePages (url, out) {
     const _getPage = url => {
-      console.log('get page'.yellow, url)
+      log.info('get page', url)
       return rp({
         transform: (body, {headers}) => {
           return {
