@@ -106,7 +106,8 @@ class CanvasApi {
           return {
             body,
             headers
-          } },
+          }
+        },
         url,
         auth: {
           'bearer': this.apiKey
