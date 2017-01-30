@@ -13,12 +13,12 @@ example:
 const CanvasApi = require('./canvasApi')
 const canvasApi = new CanvasApi('http://my.canvas.api', 'my canvas key')
 */
-class CanvasApi{
-  constructor(_apiUrl, _apiKey) {
+class CanvasApi {
+  constructor (_apiUrl, _apiKey) {
     this.apiUrl = _apiUrl
     this.apiKey = _apiKey
 
-    this.listCourses  = () => {
+    this.listCourses = () => {
       const result = []
       log.info(`Listing courses in canvas`)
 
@@ -36,15 +36,15 @@ class CanvasApi{
         .then(() => [].concat.apply([], result)) // flatten array
     }
   }
-  set logger(logger) {
+  set logger (logger) {
     log.info('overriding logger for canvasApi')
     log = logger
   }
-  get logger() {
+  get logger () {
     return log
   }
 
-  get rootAccount(){
+  get rootAccount () {
     return this.getRootAccount()
   }
 
@@ -206,32 +206,32 @@ class CanvasApi{
     return this.requestCanvas(`courses/${courseId}/enrollments`)
   }
 
-  getSisStatus(sisImportId) {
+  getSisStatus (sisImportId) {
     return this.getRootAccount()
-    .then(accountId =>this.requestCanvas(`accounts/${accountId}/sis_imports/${sisImportId}`))
+    .then(accountId => this.requestCanvas(`accounts/${accountId}/sis_imports/${sisImportId}`))
   }
 
-  pollUntilSisComplete(sisImportId, wait=100){
-    return new Promise((resolve, reject)=>{
+  pollUntilSisComplete (sisImportId, wait = 100) {
+    return new Promise((resolve, reject) => {
       this.getSisStatus(sisImportId)
-      .then(result=>{
+      .then(result => {
         log.info('progress:', result.progress)
-        if(result.progress === 100){
+        if (result.progress === 100) {
           // csv complete
           resolve(result)
-        }else{
-          log.info(`not yet complete, try again in ${wait/1000} seconds`)
+        } else {
+          log.info(`not yet complete, try again in ${wait / 1000} seconds`)
           // Not complete, wait and try again
-          setTimeout(()=>{
-            return this.pollUntilSisComplete(sisImportId, wait*2)
+          setTimeout(() => {
+            return this.pollUntilSisComplete(sisImportId, wait * 2)
             .then(result => resolve(result))
-          },wait)
+          }, wait)
         }
       })
     })
   }
 
-  sendCsvFile (filename, json=false,account=1, options={}) {
+  sendCsvFile (filename, json = false, account = 1, options = {}) {
     const {batchMode, batchTerm} = options
     log.info('Ready to send CSV file: ' + filename, batchMode, batchTerm)
     var formData = {
@@ -239,7 +239,7 @@ class CanvasApi{
         fs.createReadStream(filename)
       ]
     }
-    const url = `${this.apiUrl}/accounts/${account}/sis_imports${batchMode?'?batch_mode=1':''}${batchTerm?'&batch_mode_term_id='+batchTerm:''}`
+    const url = `${this.apiUrl}/accounts/${account}/sis_imports${batchMode ? '?batch_mode=1' : ''}${batchTerm ? '&batch_mode_term_id=' + batchTerm : ''}`
     log.info('url', url)
 
     return rp({
