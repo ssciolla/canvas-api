@@ -162,10 +162,10 @@ class CanvasApi {
   createDefaultSection (course, accountId) {
     log.info(`Creating section ${JSON.stringify(course, null, 4)} with account ${accountId} in canvas`)
     const courseSection = {
-      course_section:{
-        name:`Section for ${course.name}`,
-        sis_course_id:course.sis_course_id,
-        sis_section_id:course.sis_course_id
+      course_section: {
+        name: `Section for ${course.name}`,
+        sis_course_id: course.sis_course_id,
+        sis_section_id: course.sis_course_id
       }}
     return this.requestCanvas(`courses/${course.id}/sections`, 'POST', courseSection)
   }
