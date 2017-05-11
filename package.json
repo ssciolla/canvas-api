@@ -8,6 +8,10 @@
     "test": "tape \"test/**/*.js\" | tap-spec",
     "postversion": "git push && git push --tags && npm publish"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kth/canvas-api"
+  },
   "author": "emilsten@kth.se",
   "license": "MIT",
   "dependencies": {
