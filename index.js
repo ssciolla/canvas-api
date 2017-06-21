@@ -2,6 +2,9 @@ const rp = require('request-promise')
 const defaultLogger = require('kth-console-log')
 const fs = require('fs')
 
+const EventEmitter = require('events')
+
+
 var log = defaultLogger
 
 /*
@@ -16,6 +19,7 @@ class CanvasApi {
   constructor (_apiUrl, _apiKey) {
     this.apiUrl = _apiUrl
     this.apiKey = _apiKey
+    this.eventEmitter = new EventEmitter()
 
     this.listCourses = () => {
       const result = []
@@ -76,6 +80,10 @@ class CanvasApi {
 
     })
       .then(res => json ? res.body : JSON.parse(res.body))
+      .then(body => {
+        this.eventEmitter.emit('canvasResponse', body)
+        return body
+      })
       // dont log entire error since that includes the access token
       .catch(e => {
         // Don't include everything in the error, since the request object
