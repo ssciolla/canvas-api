@@ -4,7 +4,6 @@ const fs = require('fs')
 
 const EventEmitter = require('events')
 
-
 var log = defaultLogger
 
 /*
