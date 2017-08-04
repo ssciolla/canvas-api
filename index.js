@@ -94,7 +94,6 @@ class CanvasApi {
       })
   }
 
-
   getRootAccount () {
     return this.listAccounts()
             .then(accounts => accounts.find(account => account.name === 'KTH Royal Institute of Technology' && account.workflow_state === 'active'))
@@ -202,7 +201,7 @@ class CanvasApi {
         if (foundUsers.length === 1) {
           return foundUsers[0]
         } else {
-          return Promise.reject(`Couldn't return exactly one user, since the query returned ${foundUsers.length} users`)
+          return Error(`Couldn't return exactly one user, since the query returned ${foundUsers.length} users`)
         }
       })
   }
