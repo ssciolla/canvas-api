@@ -225,7 +225,7 @@ class CanvasApi {
   getEnrollments (courseId) {
     log.info(`Getting enrollments for course with unique_id ${courseId} in canvas`)
 
-    return this.requestCanvas(`courses/${courseId}/enrollments`)
+    return this.recursePages(`${this.apiUrl}/courses/${courseId}/enrollments?per_page=100`)
   }
 
   getSisStatus (sisImportId) {
