@@ -94,6 +94,7 @@ class CanvasApi {
       })
   }
 
+
   getRootAccount () {
     return this.listAccounts()
             .then(accounts => accounts.find(account => account.name === 'KTH Royal Institute of Technology' && account.workflow_state === 'active'))
@@ -104,7 +105,7 @@ class CanvasApi {
     return this.requestCanvas('accounts')
   }
 
-  recursePages (url, out) {
+  recursePages (url, out = []) {
     const _getPage = url => {
       log.info('get page', url)
       return rp({
