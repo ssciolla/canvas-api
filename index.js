@@ -6,6 +6,10 @@ const EventEmitter = require('events')
 
 var log = defaultLogger
 
+function flatten (arr) {
+  return [].concat.apply([], arr)
+}
+
 /*
 This returns an object with all the exported functions,
 but has to be called with apiKey and apiUrl.
@@ -26,7 +30,6 @@ class CanvasApi {
 
       return this.rootAccount
         .then(accountId => this.recursePages(`${this.apiUrl}/accounts/${accountId}/courses?per_page=100`, result))
-        .then(() => [].concat.apply([], result)) // flatten array
     }
 
     this.listSubaccounts = parentAccountId => {
@@ -35,7 +38,6 @@ class CanvasApi {
 
       return this.rootAccount
         .then(accountId => this.recursePages(`${this.apiUrl}/accounts/${parentAccountId}/sub_accounts?per_page=100`, result))
-        .then(() => [].concat.apply([], result)) // flatten array
     }
   }
   set logger (logger) {
@@ -135,7 +137,7 @@ class CanvasApi {
           const [[nextUrlTag]] = nextPageHeader
           return this.recursePages(nextUrlTag.slice(1, nextUrlTag.length - 1), out)
         } else {
-          return out
+          return flatten(out)
         }
       })
   }
@@ -145,7 +147,6 @@ class CanvasApi {
     log.info(`Listing users in canvas`)
     return this.rootAccount
       .then(accountId => this.recursePages(`${this.apiUrl}/accounts/${accountId}/users?per_page=100`, result))
-      .then(users => [].concat.apply([], users)) // flatten array
   }
 
   createUser (user) {
