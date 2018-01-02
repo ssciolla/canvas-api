@@ -127,7 +127,10 @@ class CanvasApi {
     }
 
     return _getPage(url)
-      .then(({body, headers}) => {
+      .then(_page => {
+
+      console.log('body:', _page)
+      const {body, headers} = _page
         out.push(JSON.parse(body))
 
         const arrayOfRelHeaders = headers.link.split(',').map(rel => rel.split(';'))
@@ -152,7 +155,7 @@ class CanvasApi {
   createUser (user) {
     return this.rootAccount
       .then(accountId => {
-        log.info(`Creating user ${user} in canvas`)
+        log.info(`Creating user ${JSON.stringify(user)} in canvas`)
         return this.requestCanvas(`accounts/${accountId}/users`, 'POST', user)
       })
   }
