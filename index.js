@@ -106,8 +106,8 @@ class CanvasApi {
     return this.requestCanvas('accounts')
   }
 
-  recurse(subUrl){
-    return recursePages(`${this.apiUrl}/${subUrl}`)
+  recurse (subUrl) {
+    return this.recursePages(`${this.apiUrl}/${subUrl}`)
   }
 
   recursePages (url, out = []) {
@@ -132,9 +132,8 @@ class CanvasApi {
 
     return _getPage(url)
       .then(_page => {
-
-      console.log('body:', _page)
-      const {body, headers} = _page
+        console.log('body:', _page)
+        const {body, headers} = _page
         out.push(JSON.parse(body))
 
         const arrayOfRelHeaders = headers.link.split(',').map(rel => rel.split(';'))
