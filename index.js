@@ -132,7 +132,6 @@ class CanvasApi {
 
     return _getPage(url)
       .then(_page => {
-        console.log('body:', _page)
         const {body, headers} = _page
         out.push(JSON.parse(body))
 
