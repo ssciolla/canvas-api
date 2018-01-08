@@ -107,7 +107,8 @@ class CanvasApi {
   }
 
   async recurse (subUrl, cb) {
-    return this.recursePages(`${this.apiUrl}/${subUrl}`)
+    const result = await this.recursePages(`${this.apiUrl}/${subUrl}`)
+    return result
   }
 
   recursePages (url, out = [], cb = null) {
