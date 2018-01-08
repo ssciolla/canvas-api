@@ -111,7 +111,7 @@ class CanvasApi {
     return result
   }
 
-  recursePages (url, out = [], cb = null) {cg
+  recursePages (url, out = [], cb = null) {
     const _getPage = url => {
       log.info('get page', url)
       return rp({
@@ -141,7 +141,7 @@ class CanvasApi {
       .then(_page => {
         const {body, headers} = _page
         out.push(JSON.parse(body))
-        if(!headers.link){
+        if (!headers.link) {
           return flatten(out)
         }
         const arrayOfRelHeaders = headers.link.split(',').map(rel => rel.split(';'))
