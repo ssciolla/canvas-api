@@ -106,11 +106,11 @@ class CanvasApi {
     return this.requestCanvas('accounts')
   }
 
-  async recurse (subUrl) {
+  async recurse (subUrl, cb) {
     return await this.recursePages(`${this.apiUrl}/${subUrl}`)
   }
 
-  recursePages (url, out = []) {
+  recursePages (url, out = [], cb = null) {
     const _getPage = url => {
       log.info('get page', url)
       return rp({
@@ -131,6 +131,12 @@ class CanvasApi {
     }
 
     return _getPage(url)
+      .then(_page => {
+        if(cb){
+          cb.call(_page)
+        }
+        return _page
+      })
       .then(_page => {
         const {body, headers} = _page
         out.push(JSON.parse(body))
