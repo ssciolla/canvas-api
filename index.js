@@ -107,11 +107,12 @@ class CanvasApi {
   }
 
   async get (subUrl, cb) {
-    const result = await this.recursePages(`${this.apiUrl}/${subUrl}`)
+    const result = []
+    await this.recursePages(`${this.apiUrl}/${subUrl}`, result, cb)
     return result
   }
 
-  recursePages (url, out = [], cb = null) {
+  async recursePages (url, out = [], cb = null) {
     const _getPage = url => {
       log.info('get page', url)
       return rp({
@@ -131,29 +132,32 @@ class CanvasApi {
       })
     }
 
-    return _getPage(url)
-      .then(_page => {
-        if (cb) {
-          cb.call(_page)
-        }
-        return _page
-      })
-      .then(_page => {
-        const {body, headers} = _page
-        out.push(JSON.parse(body))
-        if (!headers.link) {
-          return flatten(out)
-        }
-        const arrayOfRelHeaders = headers.link.split(',').map(rel => rel.split(';'))
+    const {body, headers} = await _getPage(url)
 
-        const nextPageHeader = arrayOfRelHeaders.filter(([urlTag, rel]) => /next/.test(rel))
-        if (nextPageHeader && nextPageHeader.length && nextPageHeader[0].length) {
-          const [[nextUrlTag]] = nextPageHeader
-          return this.recursePages(nextUrlTag.slice(1, nextUrlTag.length - 1), out)
-        } else {
-          return flatten(out)
-        }
-      })
+    const bodyParsed = JSON.parse(body)
+
+    if (cb) {
+      cb(bodyParsed)
+    }
+
+    if (Array.isArray(bodyParsed)) {
+      out.push(...bodyParsed)
+    } else {
+      out.push(bodyParsed)
+    }
+
+    if (!headers.link) {
+      return flatten(out)
+    }
+    const arrayOfRelHeaders = headers.link.split(',').map(rel => rel.split(';'))
+
+    const nextPageHeader = arrayOfRelHeaders.filter(([urlTag, rel]) => /next/.test(rel))
+    if (nextPageHeader && nextPageHeader.length && nextPageHeader[0].length) {
+      const [[nextUrlTag]] = nextPageHeader
+      return this.recursePages(nextUrlTag.slice(1, nextUrlTag.length - 1), out)
+    } else {
+      return flatten(out)
+    }
   }
 
   listUsers () {
