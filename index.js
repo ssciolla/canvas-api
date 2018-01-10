@@ -137,6 +137,7 @@ class CanvasApi {
     const bodyParsed = JSON.parse(body)
 
     if (cb) {
+      log.info('about to call callback for this page...')
       cb(bodyParsed)
     }
 
@@ -154,7 +155,7 @@ class CanvasApi {
     const nextPageHeader = arrayOfRelHeaders.filter(([urlTag, rel]) => /next/.test(rel))
     if (nextPageHeader && nextPageHeader.length && nextPageHeader[0].length) {
       const [[nextUrlTag]] = nextPageHeader
-      return this.recursePages(nextUrlTag.slice(1, nextUrlTag.length - 1), out)
+      return this.recursePages(nextUrlTag.slice(1, nextUrlTag.length - 1), out, cb)
     } else {
       return flatten(out)
     }
