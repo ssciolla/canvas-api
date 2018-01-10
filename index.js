@@ -113,32 +113,29 @@ class CanvasApi {
   }
 
   async recursePages (url, out = [], cb = null) {
-    const _getPage = url => {
-      log.info('get page', url)
-      return rp({
-        transform: (body, {headers}) => {
-          return {
-            body,
-            headers
-          }
-        },
-        url,
-        auth: {
-          'bearer': this.apiKey
-        },
-        headers: {
-          'content-type': 'application/json'
+    log.info('get page', url)
+    const {body, headers} = await rp({
+      transform: (body, {headers}) => {
+        return {
+          body,
+          headers
         }
-      })
-    }
-
-    const {body, headers} = await _getPage(url)
+      },
+      url,
+      auth: {
+        'bearer': this.apiKey
+      },
+      headers: {
+        'content-type': 'application/json'
+      }
+    })
 
     const bodyParsed = JSON.parse(body)
 
     if (cb) {
       log.info('about to call callback for this page...')
-      cb(bodyParsed)
+      await cb(bodyParsed)
+      log.info('after calling callback')
     }
 
     if (Array.isArray(bodyParsed)) {
@@ -155,7 +152,7 @@ class CanvasApi {
     const nextPageHeader = arrayOfRelHeaders.filter(([urlTag, rel]) => /next/.test(rel))
     if (nextPageHeader && nextPageHeader.length && nextPageHeader[0].length) {
       const [[nextUrlTag]] = nextPageHeader
-      return this.recursePages(nextUrlTag.slice(1, nextUrlTag.length - 1), out, cb)
+      return await this.recursePages(nextUrlTag.slice(1, nextUrlTag.length - 1), out, cb)
     } else {
       return flatten(out)
     }
