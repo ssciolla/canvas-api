@@ -114,47 +114,57 @@ class CanvasApi {
 
   async recursePages (url, out = [], cb = null) {
     log.info('get page', url)
-    const {body, headers} = await rp({
-      transform: (body, {headers}) => {
-        return {
-          body,
-          headers
+    try {
+      const {body, headers} = await rp({
+        transform: (body, {headers}) => {
+          return {
+            body,
+            headers
+          }
+        },
+        url,
+        auth: {
+          'bearer': this.apiKey
+        },
+        headers: {
+          'content-type': 'application/json'
         }
-      },
-      url,
-      auth: {
-        'bearer': this.apiKey
-      },
-      headers: {
-        'content-type': 'application/json'
+      })
+
+      const bodyParsed = JSON.parse(body)
+
+      if (cb) {
+        log.info('about to call callback for this page...')
+        console.log(cb)
+        await cb(bodyParsed)
+        log.info('after calling callback')
       }
-    })
 
-    const bodyParsed = JSON.parse(body)
+      if (Array.isArray(bodyParsed)) {
+        out.push(...bodyParsed)
+      } else {
+        out.push(bodyParsed)
+      }
 
-    if (cb) {
-      log.info('about to call callback for this page...')
-      await cb(bodyParsed)
-      log.info('after calling callback')
-    }
+      if (!headers.link) {
+        return flatten(out)
+      }
+      const arrayOfRelHeaders = headers.link.split(',').map(rel => rel.split(';'))
 
-    if (Array.isArray(bodyParsed)) {
-      out.push(...bodyParsed)
-    } else {
-      out.push(bodyParsed)
-    }
-
-    if (!headers.link) {
-      return flatten(out)
-    }
-    const arrayOfRelHeaders = headers.link.split(',').map(rel => rel.split(';'))
-
-    const nextPageHeader = arrayOfRelHeaders.filter(([urlTag, rel]) => /next/.test(rel))
-    if (nextPageHeader && nextPageHeader.length && nextPageHeader[0].length) {
-      const [[nextUrlTag]] = nextPageHeader
-      return await this.recursePages(nextUrlTag.slice(1, nextUrlTag.length - 1), out, cb)
-    } else {
-      return flatten(out)
+      const nextPageHeader = arrayOfRelHeaders.filter(([urlTag, rel]) => /next/.test(rel))
+      if (nextPageHeader && nextPageHeader.length && nextPageHeader[0].length) {
+        const [[nextUrlTag]] = nextPageHeader
+        return await this.recursePages(nextUrlTag.slice(1, nextUrlTag.length - 1), out, cb)
+      } else {
+        return flatten(out)
+      }
+    } catch (e) {
+      log.info('Stripping the Exception to only include the message, no headers or such.')
+      const strippedError = new Error(e.message)
+      strippedError.stack = e.stack
+      strippedError.statusCode = e.statusCode
+      strippedError.statusMessage = e.statusMessage
+      throw strippedError
     }
   }
 
