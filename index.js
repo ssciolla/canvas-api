@@ -98,8 +98,8 @@ class CanvasApi {
 
   getRootAccount () {
     return this.listAccounts()
-            .then(accounts => accounts.find(account => account.name === 'KTH Royal Institute of Technology' && account.workflow_state === 'active'))
-            .then(account => account.id)
+      .then(accounts => accounts.find(account => account.name === 'KTH Royal Institute of Technology' && account.workflow_state === 'active'))
+      .then(account => account.id)
   }
 
   listAccounts () {
@@ -257,26 +257,26 @@ class CanvasApi {
 
   getSisStatus (sisImportId) {
     return this.getRootAccount()
-    .then(accountId => this.requestCanvas(`accounts/${accountId}/sis_imports/${sisImportId}`))
+      .then(accountId => this.requestCanvas(`accounts/${accountId}/sis_imports/${sisImportId}`))
   }
 
   pollUntilSisComplete (sisImportId, wait = 100) {
     return new Promise((resolve, reject) => {
       this.getSisStatus(sisImportId)
-      .then(result => {
-        log.info('progress:', result.progress)
-        if (result.progress === 100) {
+        .then(result => {
+          log.info('progress:', result.progress)
+          if (result.progress === 100) {
           // csv complete
-          resolve(result)
-        } else {
-          log.info(`not yet complete, try again in ${wait / 1000} seconds`)
-          // Not complete, wait and try again
-          setTimeout(() => {
-            return this.pollUntilSisComplete(sisImportId, wait * 2)
-            .then(result => resolve(result))
-          }, wait)
-        }
-      })
+            resolve(result)
+          } else {
+            log.info(`not yet complete, try again in ${wait / 1000} seconds`)
+            // Not complete, wait and try again
+            setTimeout(() => {
+              return this.pollUntilSisComplete(sisImportId, wait * 2)
+                .then(result => resolve(result))
+            }, wait)
+          }
+        })
     })
   }
 
@@ -303,7 +303,7 @@ class CanvasApi {
       },
       formData,
       json
-    }).catch(e =>{
+    }).catch(e => {
       const strippedError = new Error(e.message)
       strippedError.statusCode = e.statusCode
       strippedError.statusMessage = e.statusMessage
