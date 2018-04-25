@@ -282,7 +282,7 @@ class CanvasApi {
 
   sendCsvFile (filename, json = false, account = 1, options = {}) {
     const {batchMode, batchTerm} = options
-    log.info('Ready to send CSV file: ' + filename, batchMode, batchTerm)
+    log.info(`Ready to send CSV file: ${filename}, batchMode: ${batchMode}, batchTerm: ${batchTerm}`)
     var formData = {
       attachment: [
         fs.createReadStream(filename)
