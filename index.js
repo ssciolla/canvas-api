@@ -288,6 +288,7 @@ class CanvasApi {
         fs.createReadStream(filename)
       ]
     }
+
     const url = `${this.apiUrl}/accounts/${account}/sis_imports${batchMode ? '?batch_mode=1' : ''}${batchTerm ? '&batch_mode_term_id=' + batchTerm : ''}`
     log.info('url', url)
 
@@ -302,6 +303,11 @@ class CanvasApi {
       },
       formData,
       json
+    }).catch(e =>{
+      const strippedError = new Error(e.message)
+      strippedError.statusCode = e.statusCode
+      strippedError.statusMessage = e.statusMessage
+      throw strippedError
     })
   }
 }
