@@ -135,7 +135,6 @@ class CanvasApi {
 
       if (cb) {
         log.info('about to call callback for this page...')
-        console.log(cb)
         await cb(bodyParsed)
         log.info('after calling callback')
       }
