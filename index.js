@@ -115,8 +115,8 @@ class CanvasApi {
   async recursePages (url, out = [], cb = null) {
     log.info('get page', url)
     try {
-      const {body, headers} = await rp({
-        transform: (body, {headers}) => {
+      const { body, headers } = await rp({
+        transform: (body, { headers }) => {
           return {
             body,
             headers
@@ -199,7 +199,7 @@ class CanvasApi {
         name: `Section for ${course.name}`,
         sis_course_id: course.sis_course_id,
         sis_section_id: course.sis_course_id
-      }}
+      } }
     return this.requestCanvas(`courses/${course.id}/sections`, 'POST', courseSection)
   }
 
@@ -234,7 +234,7 @@ class CanvasApi {
 
   enrollUser (course, user, type) {
     log.info(`Enrolling user.id ${user.id} of type ${type} to course.id ${course.id} in canvas`)
-    const body = {enrollment: {'user_id': user.id, type, 'notify': true}}
+    const body = { enrollment: { 'user_id': user.id, type, 'notify': true } }
     return this.requestCanvas(`courses/${course.id}/enrollments `, 'POST', body)
   }
 
@@ -280,7 +280,7 @@ class CanvasApi {
   }
 
   sendCsvFile (filename, json = false, account = 1, options = {}) {
-    const {batchMode, batchTerm} = options
+    const { batchMode, batchTerm } = options
     log.info(`Ready to send CSV file: ${filename}, batchMode: ${batchMode}, batchTerm: ${batchTerm}`)
     var formData = {
       attachment: [
