@@ -1,11 +1,14 @@
-var test = require('tape')
+const test = require('ava')
+const Canvas = require('../index')
 
-test.only('should be able to mock functions on canvasApi', t => {
-  const CanvasApi = require('../index')
-  const canvasApi = new CanvasApi()
+test('Token is correctly stripped', async t => {
+  t.plan(1)
+  const canvas = Canvas('https://kth.test.instructure.com/api/v1', 'My token')
 
-  CanvasApi.prototype.findCourse = () => true
-
-  t.ok(canvasApi.findCourse())
-  t.end()
+  try {
+    await canvas.requestUrl('/accounts')
+  } catch (err) {
+    const error = JSON.stringify(err)
+    t.notRegex(error, /My token/)
+  }
 })
