@@ -1,10 +1,17 @@
 const rp = require('request-promise')
 
+function removeToken (err) {
+  delete err.error
+  delete err.options
+  delete err.response
+  return err
+}
+
 module.exports = (apiUrl, apiKey, options = {}) => {
   return {
-    async requestUrl (endpoint, method = 'GET', parameters) {
+    async requestUrl (endpoint, method = 'GET', parameters = {}) {
       try {
-        return rp({
+        const result = await rp({
           baseUrl: apiUrl,
           url: endpoint,
           json: true,
@@ -15,8 +22,9 @@ module.exports = (apiUrl, apiKey, options = {}) => {
           body: parameters,
           method
         })
+        return result
       } catch (err) {
-        throw err
+        throw removeToken(err)
       }
     }
   }
