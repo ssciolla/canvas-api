@@ -36,20 +36,23 @@ module.exports = (apiUrl, apiKey, options = {}) => {
       }
     },
 
-    async * requestPaginated (endpoint, method = 'GET', parameters = {}) {
+    async * requestPaginated (endpoint, parameters = {}) {
       try {
         let url = apiUrl + endpoint
 
         while (url) {
           const response = await rp({
+            method: 'GET',
             json: true,
             resolveWithFullResponse: true,
             auth: {
               bearer: apiKey
             },
-            body: parameters,
-            url,
-            method
+            qs: {
+              per_page: 100,
+              ...parameters
+            },
+            url
           })
 
           yield response.body
