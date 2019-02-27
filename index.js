@@ -44,8 +44,8 @@ module.exports = (apiUrl, apiKey, options = {}) => {
           const response = await rp({
             json: true,
             resolveWithFullResponse: true,
-            headers: {
-              'User-Agent': 'example.com'
+            auth: {
+              bearer: apiKey
             },
             body: parameters,
             url,
