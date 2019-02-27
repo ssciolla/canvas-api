@@ -38,6 +38,10 @@ module.exports = (apiUrl, apiKey, options = {}) => {
       }
     },
 
+    async get (endpoint, parameters = {}) {
+      return requestUrl(endpoint, 'GET', {}, {qs: parameters})
+    },
+
     async * getPaginated (endpoint, parameters = {}) {
       try {
         let url = resolve(apiUrl, endpoint)
