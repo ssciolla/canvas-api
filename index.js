@@ -1,4 +1,5 @@
 const rp = require('request-promise')
+const { resolve } = require('url')
 
 function removeToken (err) {
   delete err.error
@@ -38,7 +39,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
 
     async * requestPaginated (endpoint, parameters = {}) {
       try {
-        let url = apiUrl + endpoint
+        let url = resolve(apiUrl, endpoint)
 
         while (url) {
           const response = await rp({
