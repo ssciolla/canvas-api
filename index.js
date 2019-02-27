@@ -18,7 +18,7 @@ function getNextUrl (linkHeader) {
 
 module.exports = (apiUrl, apiKey, options = {}) => {
   return {
-    async requestUrl (endpoint, method = 'GET', parameters = {}) {
+    async requestUrl (endpoint, method = 'GET', parameters = {}, extra = {}) {
       try {
         const result = await rp({
           baseUrl: apiUrl,
@@ -29,7 +29,8 @@ module.exports = (apiUrl, apiKey, options = {}) => {
             bearer: apiKey
           },
           body: parameters,
-          method
+          method,
+          ...extra
         })
         return result
       } catch (err) {
