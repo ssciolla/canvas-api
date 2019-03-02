@@ -42,7 +42,15 @@ module.exports = (apiUrl, apiKey, options = {}) => {
       return requestUrl(endpoint, 'GET', {}, {qs: parameters})
     },
 
-    async * getPaginated (endpoint, parameters = {}) {
+    async * list (endpoint, parameters = {}) {
+      for await (let page of listPaginated(endpoint, parameters)) {
+        for (let element of page) {
+          yield element
+        }
+      }
+    },
+
+    async * listPaginated (endpoint, parameters = {}) {
       try {
         let url = resolve(apiUrl, endpoint)
 
