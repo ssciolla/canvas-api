@@ -5,7 +5,7 @@
 Once you build a canvas instance, you get an object with only four methods:
 
 1. The low-level `requestUrl()` method to perform any request with any HTTP method
-2. Three helper methods for doing GET requests:
+2. Three high-level methods for doing GET requests:
    - `get()` to perform a GET request
    - `list()` to perform a GET request and iterate through the results
    - `listPaginated()` like *list()* but for iterating through pages
