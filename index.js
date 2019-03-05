@@ -17,8 +17,13 @@ function getNextUrl (linkHeader) {
 }
 
 module.exports = (apiUrl, apiKey, options = {}) => {
+  const log = options.log || (() => {})
+
   return {
     async requestUrl (endpoint, method = 'GET', parameters = {}, extra = {}) {
+      const url = resolve(apiUrl, endpoint)
+
+      log(`Request ${method} ${url}`)
       try {
         const result = await rp({
           baseUrl: apiUrl,
@@ -32,6 +37,8 @@ module.exports = (apiUrl, apiKey, options = {}) => {
           method,
           ...extra
         })
+
+        log(`Response from ${method} ${url}`)
         return result
       } catch (err) {
         throw removeToken(err)
@@ -44,6 +51,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
 
     async * list (endpoint, parameters = {}) {
       for await (let page of listPaginated(endpoint, parameters)) {
+        log(`Traversing a page...`)
         for (let element of page) {
           yield element
         }
@@ -55,6 +63,8 @@ module.exports = (apiUrl, apiKey, options = {}) => {
         let url = resolve(apiUrl, endpoint)
 
         while (url) {
+          log(`Request ${method} ${url}`)
+
           const response = await rp({
             method: 'GET',
             json: true,
@@ -69,6 +79,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
             url
           })
 
+          log(`Response from ${method} ${url}`)
           yield response.body
 
           url = getNextUrl(response.headers.link)

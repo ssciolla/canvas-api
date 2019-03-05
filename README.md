@@ -25,6 +25,13 @@ const token = 'AAAA~XXX'
 const canvas = Canvas(url, token)
 ```
 
+The builder function accepts three arguments:
+
+1. `url`. The root URL of the Canvas API
+2. `token`. A token obtained from Canvas to make API requests
+3. `options`. *optional* An object containing:
+   - `log`. A function that will be called with logging messages. Default: empty function
+
 ### Basic usage of `get()`, `list()` and `listPaginated()`
 
 Use `get()` to get a single resource
