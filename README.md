@@ -1,4 +1,9 @@
-# This library is used to integrate with the Canvas LMS.
+# Canvas API
+
+NodeJS interface for making requests to the [Canvas LMS API](https://canvas.instructure.com/doc/api/)
+
+[![Build Status](https://travis-ci.org/KTH/canvas-api.svg?branch=master)](https://travis-ci.org/KTH/canvas-api)
+
 
 ## How to use
 
@@ -10,34 +15,54 @@ Once you build a canvas instance, you get an object with only four methods:
    - `list()` to perform a GET request and iterate through the results
    - `listPaginated()` like *list()* but for iterating through pages
 
-### Helper methods (GET requests)
+### Build the Canvas instance
 
-```js
+``` js
 const Canvas = require('kth-canvas-api')
 
 const url = 'https://xxx.instructure.com/api/v1'
 const token = 'AAAA~XXX'
 const canvas = Canvas(url, token)
+```
 
-// Use `get()` to get a single resource... this will return only the
-// "first page". Sometimes it's enough
+### Basic usage of `get()`, `list()` and `listPaginated()`
+
+Use `get()` to get a single resource
+
+``` js
+// This will return only the "first page".
+// Sometimes it's enough
 const courses = await canvas.get('/courses')
+```
 
-// Use `list()` to get a list of resources and iterate through them
+Use `list()` to get a list of resources and iterate through them. `list()` returns an async iterable that iterates for each element.
+
+``` js
 const courses = canvas.list('/courses')
 for await (let course of courses) {
   console.log(course.id)
 }
+```
 
-// Use `listPaginated()` if you want to iterate through pages
+Use `listPaginated()` to get a list of pages and iterate through them. `listPaginated()` returns an async iterable that iterates per page.
+
+```js
 const pages = canvas.listPaginated('/courses')
+
 for await (let page of pages) {
   // Each "page" is a list of courses
   console.log(page.length)
 }
 
-// You can pass query parameters to the request with all the methods
+```
+
+### Advanced usage
+
+You can pass query parameters to the request with all the methods
+
+```js
 // Equivalent to GET /courses?enrollment_type=teacher will be:
+
 const courses = await canvas.get('/courses', {enrollment_type: 'teacher'})
 const courses = await canvas.list('/courses', {enrollment_type: 'teacher'})
 const pages = await canvas.listPaginated('/courses', {enrollment_type: 'teacher'})
@@ -45,20 +70,25 @@ const pages = await canvas.listPaginated('/courses', {enrollment_type: 'teacher'
 
 ### Low-level `requestUrl` (for non-GET requests)
 
-```js
-// The method returns a full response (including headers, statusCode...)
-const {body, headers, statusCode} = await canvas.requestUrl('/courses', 'POST')
+The method returns a full response (including headers, statusCode...)
 
-// Pass an object as body parameter
+```js
+const {body, headers, statusCode} = await canvas.requestUrl('/courses', 'POST')
+```
+
+Send body parameters with the request passing an object as third argument
+
+```js
 const body = {
   name: 'Example course'
 }
 const response = await canvas.requestUrl('/courses', 'POST', body)
 
-// You can use the fourth parameter to pass extra options to the request
-// Read the documentation on the `request` and `request-promise` library
-// https://github.com/request/request
-// https://github.com/request/request-promise
+```
+
+You can use the fourth parameter to pass extra options to the request. Read the documentation of [Request](https://github.com/request/request) and [Request Promise](https://github.com/request/request-promise) libraries
+
+``` js
 const options = {
   resolveWithFullResponse: false
 }
