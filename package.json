@@ -1,11 +1,11 @@
 {
-  "name": "kth-canvas-api",
-  "version": "0.15.7",
+  "name": "@kth/canvas-api",
+  "version": "1.0.0",
   "description": " Functions for communicating with Canvas LMS",
   "main": "index.js",
   "scripts": {
     "codecheck": "standard",
-    "test": "tape \"test/**/*.js\" | tap-spec",
+    "test": "ava",
     "postversion": "git push && git push --tags && npm publish"
   },
   "repository": {
@@ -15,7 +15,6 @@
   "author": "emilsten@kth.se",
   "license": "MIT",
   "dependencies": {
-    "kth-console-log": "1.x",
     "request": "^2.88.0",
     "request-promise": "^4.2.2"
   },
@@ -24,9 +23,8 @@
     "test"
   ],
   "devDependencies": {
+    "ava": "^1.2.1",
     "pre-push": "^0.1.1",
-    "standard": "^8.6.0",
-    "tap-spec": "^5.0.0",
-    "tape": "^4.9.1"
+    "standard": "^8.6.0"
   }
 }
