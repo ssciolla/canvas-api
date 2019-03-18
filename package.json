@@ -4,9 +4,8 @@
   "description": " Functions for communicating with Canvas LMS",
   "main": "index.js",
   "scripts": {
-    "codecheck": "standard",
-    "test": "ava",
-    "postversion": "git push && git push --tags && npm publish"
+    "test-style": "standard",
+    "test": "ava"
   },
   "repository": {
     "type": "git",
@@ -18,13 +17,8 @@
     "request": "^2.88.0",
     "request-promise": "^4.2.2"
   },
-  "pre-push": [
-    "codecheck",
-    "test"
-  ],
   "devDependencies": {
     "ava": "^1.2.1",
-    "pre-push": "^0.1.1",
     "standard": "^8.6.0"
   }
 }
