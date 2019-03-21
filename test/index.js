@@ -16,20 +16,31 @@ test('Token is correctly stripped', async t => {
 })
 
 test('URLs are correctly "resolved"', async t => {
-  const base = 'http://example.com'
-  const e = '/index'
+  const urls = [
+    {base: 'http://example.com',  end: '/index', expected: 'http://example.com/index'},
+    {base: 'http://example.com',  end: 'index', expected: 'http://example.com/index'},
+    {base: 'http://example.com/', end: '/index', expected: 'http://example.com/index'},
+    {base: 'http://example.com/', end: 'index', expected: 'http://example.com/index'},
 
-  let spy
-  const SpecialCanvas = proxyquire('../index', {
-    'request-promise': function (obj) {
-      spy = obj.url
-      return []
-    }
-  })
+    {base: 'http://example.com/api/v1',  end: '/courses/1', expected: 'http://example.com/api/v1/courses/1'},
+    {base: 'http://example.com/api/v1',  end: 'courses/1',  expected: 'http://example.com/api/v1/courses/1'},
+    {base: 'http://example.com/api/v1/', end: '/courses/1', expected: 'http://example.com/api/v1/courses/1'},
+    {base: 'http://example.com/api/v1/', end: 'courses/1',  expected: 'http://example.com/api/v1/courses/1'}
+  ]
 
-  const canvas = SpecialCanvas(base)
-  canvas.get(e)
+  for (const {base, end, expected} of urls) {
+    let spy
+    const SpecialCanvas = proxyquire('../index', {
+      'request-promise': function (obj) {
+        spy = obj.url
+        return []
+      }
+    })
 
-  t.is(spy, 'http://example.com/index')
+    const canvas = SpecialCanvas(base)
+    canvas.get(end)
+
+    t.is(spy, expected)
+  }
 
 })
