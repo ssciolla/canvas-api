@@ -69,5 +69,5 @@ test('List returns a correct iterable', async t => {
     result.push(e)
   }
 
-  t.deepEqual([1, 2, 3, 4, 5], result)
+  t.deepEqual(result, [1, 2, 3, 4, 5])
 })
