@@ -46,7 +46,7 @@ test('URLs are correctly "resolved"', async t => {
 
 test('List returns a correct iterable', async t => {
   const SpecialCanvas = proxyquire('../index', {
-    'request-promise': function ({url}) {
+    'request-promise': function ({ url }) {
       if (url === 'http://example.com/something') {
         return {
           body: [1, 2, 3],
@@ -74,7 +74,7 @@ test('List returns a correct iterable', async t => {
 
 test('List ignores non-"rel=next" link headers', async t => {
   const SpecialCanvas = proxyquire('../index', {
-    'request-promise': function ({url}) {
+    'request-promise': function ({ url }) {
       if (url === 'http://example.com/something') {
         return {
           body: [1],
