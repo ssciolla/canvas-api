@@ -8,7 +8,7 @@ function removeToken (err) {
 }
 
 function getNextUrl (linkHeader) {
-  const next = linkHeader.split(',').find(l => l.search(/rel="next"$/))
+  const next = linkHeader.split(',').find(l => l.search(/rel="next"$/) !== -1)
 
   const url = next && next.match(/<(.*?)>/)
   return url && url[1]

@@ -71,3 +71,28 @@ test('List returns a correct iterable', async t => {
 
   t.deepEqual(result, [1, 2, 3, 4, 5])
 })
+
+test('List ignores non-"rel=next" link headers', async t => {
+  const SpecialCanvas = proxyquire('../index', {
+    'request-promise': function ({url}) {
+      if (url === 'http://example.com/something') {
+        return {
+          body: [1],
+          headers: {
+            link: '<http://dont-call.com>; rel="last", <http://ignore-this.se>; rel="prev", <http://nope.com>; rel="first"'
+          }
+        }
+      } else {
+        t.fail(`The url: "${url}" was requested and should not be!`)
+      }
+    }
+  })
+
+  const canvas = SpecialCanvas('http://example.com')
+  const result = []
+
+  for await (const e of canvas.list('/something')) {
+    result.push(e)
+  }
+  t.deepEqual(result, [1])
+})
