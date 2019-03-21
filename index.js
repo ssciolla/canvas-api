@@ -85,7 +85,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
         log(`Response from GET ${url}`)
         yield response.body
 
-        url = getNextUrl(response.headers.link)
+        url = response.headers && getNextUrl(response.headers.link)
       }
     } catch (err) {
       throw removeToken(err)
