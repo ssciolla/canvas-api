@@ -17,18 +17,18 @@ test('Token is correctly stripped', async t => {
 
 test('URLs are correctly "resolved"', async t => {
   const urls = [
-    {base: 'http://example.com',  end: '/index', expected: 'http://example.com/index'},
-    {base: 'http://example.com',  end: 'index', expected: 'http://example.com/index'},
-    {base: 'http://example.com/', end: '/index', expected: 'http://example.com/index'},
-    {base: 'http://example.com/', end: 'index', expected: 'http://example.com/index'},
+    { base: 'http://example.com', end: '/index', expected: 'http://example.com/index' },
+    { base: 'http://example.com', end: 'index', expected: 'http://example.com/index' },
+    { base: 'http://example.com/', end: '/index', expected: 'http://example.com/index' },
+    { base: 'http://example.com/', end: 'index', expected: 'http://example.com/index' },
 
-    {base: 'http://example.com/api/v1',  end: '/courses/1', expected: 'http://example.com/api/v1/courses/1'},
-    {base: 'http://example.com/api/v1',  end: 'courses/1',  expected: 'http://example.com/api/v1/courses/1'},
-    {base: 'http://example.com/api/v1/', end: '/courses/1', expected: 'http://example.com/api/v1/courses/1'},
-    {base: 'http://example.com/api/v1/', end: 'courses/1',  expected: 'http://example.com/api/v1/courses/1'}
+    { base: 'http://example.com/api/v1', end: '/courses/1', expected: 'http://example.com/api/v1/courses/1' },
+    { base: 'http://example.com/api/v1', end: 'courses/1', expected: 'http://example.com/api/v1/courses/1' },
+    { base: 'http://example.com/api/v1/', end: '/courses/1', expected: 'http://example.com/api/v1/courses/1' },
+    { base: 'http://example.com/api/v1/', end: 'courses/1', expected: 'http://example.com/api/v1/courses/1' }
   ]
 
-  for (const {base, end, expected} of urls) {
+  for (const { base, end, expected } of urls) {
     let spy
     const SpecialCanvas = proxyquire('../index', {
       'request-promise': function (obj) {
@@ -42,5 +42,4 @@ test('URLs are correctly "resolved"', async t => {
 
     t.is(spy, expected)
   }
-
 })
