@@ -43,3 +43,31 @@ test('URLs are correctly "resolved"', async t => {
     t.is(spy, expected)
   }
 })
+
+test('List returns a correct iterable', async t => {
+  const SpecialCanvas = proxyquire('../index', {
+    'request-promise': function ({url}) {
+      if (url === 'http://example.com/something') {
+        return {
+          body: [1, 2, 3],
+          headers: {
+            link: '<http://example.com/something_else>; rel="next", <irrelevant>; rel="first"'
+          }
+        }
+      } else if (url === 'http://example.com/something_else') {
+        return {
+          body: [4, 5]
+        }
+      }
+    }
+  })
+
+  const canvas = SpecialCanvas('http://example.com')
+  const result = []
+
+  for await (const e of canvas.list('/something')) {
+    result.push(e)
+  }
+
+  t.deepEqual([1, 2, 3, 4, 5], result)
+})
