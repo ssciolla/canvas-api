@@ -1,5 +1,4 @@
 const rp = require('request-promise')
-const { resolve } = require('url')
 
 function removeToken (err) {
   delete err.error
@@ -9,8 +8,7 @@ function removeToken (err) {
 }
 
 function getNextUrl (linkHeader) {
-  const next = linkHeader.split(',')
-    .find(l => l.search(/rel="next"$/))
+  const next = linkHeader.split(',').find(l => l.search(/rel="next"$/))
 
   const url = next && next.match(/<(.*?)>/)
   return url && url[1]
@@ -19,20 +17,26 @@ function getNextUrl (linkHeader) {
 module.exports = (apiUrl, apiKey, options = {}) => {
   const log = options.log || (() => {})
 
+  const resolve = endpoint => {
+    const base2 = apiUrl.slice(-1) === '/' ? apiUrl.slice(0, -1) : apiUrl
+    const endpoint2 = endpoint.charAt(0) === '/' ? endpoint.slice(1) : endpoint
+
+    return base2 + '/' + endpoint2
+  }
+
   async function requestUrl (endpoint, method = 'GET', parameters = {}, extra = {}) {
-    const url = resolve(apiUrl, endpoint)
+    const url = resolve(endpoint)
 
     log(`Request ${method} ${url}`)
     try {
       const result = await rp({
-        baseUrl: apiUrl,
-        url: endpoint,
         json: true,
         resolveWithFullResponse: true,
         auth: {
           bearer: apiKey
         },
         body: parameters,
+        url,
         method,
         ...extra
       })
@@ -59,7 +63,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
 
   async function * listPaginated (endpoint, parameters = {}) {
     try {
-      let url = resolve(apiUrl, endpoint)
+      let url = resolve(endpoint)
 
       while (url) {
         log(`Request GET ${url}`)
