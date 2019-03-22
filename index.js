@@ -55,6 +55,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
   async function * list (endpoint, parameters = {}) {
     for await (let page of listPaginated(endpoint, parameters)) {
       log(`Traversing a page...`)
+
       for (let element of page) {
         yield element
       }
@@ -78,6 +79,9 @@ module.exports = (apiUrl, apiKey, options = {}) => {
           qs: {
             per_page: 100,
             ...parameters
+          },
+          qsStringifyOptions: {
+            arrayFormat: 'brackets'
           },
           url
         })
