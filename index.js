@@ -8,7 +8,7 @@ function removeToken (err) {
 }
 
 function getNextUrl (linkHeader) {
-  const next = linkHeader.split(',').find(l => l.search(/rel="next"$/))
+  const next = linkHeader.split(',').find(l => l.search(/rel="next"$/) !== -1)
 
   const url = next && next.match(/<(.*?)>/)
   return url && url[1]
@@ -55,6 +55,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
   async function * list (endpoint, parameters = {}) {
     for await (let page of listPaginated(endpoint, parameters)) {
       log(`Traversing a page...`)
+
       for (let element of page) {
         yield element
       }
@@ -79,13 +80,16 @@ module.exports = (apiUrl, apiKey, options = {}) => {
             per_page: 100,
             ...parameters
           },
+          qsStringifyOptions: {
+            arrayFormat: 'brackets'
+          },
           url
         })
 
         log(`Response from GET ${url}`)
         yield response.body
 
-        url = getNextUrl(response.headers.link)
+        url = response.headers && getNextUrl(response.headers.link)
       }
     } catch (err) {
       throw removeToken(err)
