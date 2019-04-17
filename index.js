@@ -65,6 +65,10 @@ module.exports = (apiUrl, apiKey, options = {}) => {
   async function * listPaginated (endpoint, parameters = {}) {
     try {
       let url = resolve(endpoint)
+      let qs = {
+        per_page: 100,
+        ...parameters
+      }
 
       while (url) {
         log(`Request GET ${url}`)
@@ -76,10 +80,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
           auth: {
             bearer: apiKey
           },
-          qs: {
-            per_page: 100,
-            ...parameters
-          },
+          qs,
           qsStringifyOptions: {
             arrayFormat: 'brackets'
           },
@@ -88,8 +89,8 @@ module.exports = (apiUrl, apiKey, options = {}) => {
 
         log(`Response from GET ${url}`)
         yield response.body
-
         url = response.headers && getNextUrl(response.headers.link)
+        qs = null
       }
     } catch (err) {
       throw removeToken(err)
