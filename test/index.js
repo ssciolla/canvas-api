@@ -96,3 +96,31 @@ test('List ignores non-"rel=next" link headers', async t => {
   }
   t.deepEqual(result, [1])
 })
+
+test('List can handle pagination urls with query strings', async t => {
+  const SpecialCanvas = proxyquire('../index', {
+    'request-promise': function ({ url, qs }) {
+      if (url === 'http://example.com/something') {
+        return {
+          body: [1, 2, 3],
+          headers: {
+            link: '<http://example.com/something_else?query=string>; rel="next", <irrelevant>; rel="first"'
+          }
+        }
+      } else if (url === 'http://example.com/something_else?query=string' && !qs) {
+        return {
+          body: [4, 5]
+        }
+      }
+    }
+  })
+
+  const canvas = SpecialCanvas('http://example.com')
+  const result = []
+
+  for await (const e of canvas.list('/something')) {
+    result.push(e)
+  }
+
+  t.deepEqual(result, [1, 2, 3, 4, 5])
+})
