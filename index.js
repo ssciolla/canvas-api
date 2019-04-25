@@ -98,8 +98,6 @@ module.exports = (apiUrl, apiKey, options = {}) => {
     }
   }
 
-
-
   return {
     requestUrl,
     get,
