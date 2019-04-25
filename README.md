@@ -32,36 +32,44 @@ The builder function accepts three arguments:
 3. `options`. *optional* An object containing:
    - `log`. A function that will be called with logging messages. Default: empty function
 
-### Basic usage of `get()`, `list()` and `listPaginated()`
+### Get a single resource with `get()`
 
-Use `get()` to get a single resource
+Use `get()` to get a single resource. Get returns the whole response (not only its body)
 
 ``` js
-// This will return only the "first page".
-// Sometimes it's enough
-const courses = await canvas.get('/courses')
+const response = await canvas.get('/courses/1')
+const console.log(response.body.name)
 ```
 
-Use `list()` to get a list of resources and iterate through them. `list()` returns an async iterable that iterates for each element.
+### Get iterables with `list()` and `listPaginated()`
+
+Use `list()` to get an **iterable** of resources
 
 ``` js
-const courses = canvas.list('/courses')
-for await (let course of courses) {
+for await (let course of canvas.list('/courses')) {
   console.log(course.id)
 }
 ```
 
-Use `listPaginated()` to get a list of pages and iterate through them. `listPaginated()` returns an async iterable that iterates per page.
+Use `listPaginated()` to get an iterable of **pages**
 
 ```js
-const pages = canvas.listPaginated('/courses')
-
-for await (let page of pages) {
+for await (let page of canvas.listPaginated('/courses')) {
   // Each "page" is a list of courses
   console.log(page.length)
 }
 
 ```
+
+### Convert iterables to arrays with `.take()`
+
+Both `list()` and `listPaginated()` return special versions of iterables with a `take()` method. Use it to convert the iterables to arrays:
+
+``` javascript
+const courses = (await canvas.list('/courses').take())
+  .filter(c => c.id < 100)
+```
+
 
 ### Advanced usage
 
