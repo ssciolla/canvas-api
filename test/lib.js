@@ -8,7 +8,7 @@ test('augmentGenerator does not mutate the original generator', t => {
 
   augmentGenerator(gen())
 
-  t.falsy(gen().take)
+  t.falsy(gen().toArray)
 })
 
 test('augmentGenerator returns a valid generator', async t => {
@@ -23,12 +23,12 @@ test('augmentGenerator returns a valid generator', async t => {
   }
 })
 
-test('AugmentedIterator.take works without arguments', async t => {
+test('AugmentedIterator.toArray works without arguments', async t => {
   const gen = augmentGenerator(async function * () {
     yield 1
     yield 2
     yield 3
   })
 
-  t.deepEqual(await gen().take(), [1, 2, 3])
+  t.deepEqual(await gen().toArray(), [1, 2, 3])
 })

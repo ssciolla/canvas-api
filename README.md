@@ -61,12 +61,12 @@ for await (let page of canvas.listPaginated('/courses')) {
 
 ```
 
-### Convert iterables to arrays with `.take()`
+### Convert iterables to arrays with `.toArray()`
 
-Both `list()` and `listPaginated()` return special versions of iterables with a `take()` method. Use it to convert the iterables to arrays:
+Both `list()` and `listPaginated()` return special versions of iterables with a `toArray()` method. Use it to convert the iterables to arrays:
 
 ``` javascript
-const courses = (await canvas.list('/courses').take())
+const courses = (await canvas.list('/courses').toArray())
   .filter(c => c.id < 100)
 ```
 

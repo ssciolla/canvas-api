@@ -91,7 +91,7 @@ test('List returns an Augmented iterable', async t => {
   })
 
   const canvas = SpecialCanvas('http://example.com')
-  const result = await canvas.list('/something').take()
+  const result = await canvas.list('/something').toArray()
 
   t.deepEqual(result, [1, 2, 3, 4, 5])
 })
