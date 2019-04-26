@@ -32,3 +32,16 @@ test('AugmentedIterator.toArray works without arguments', async t => {
 
   t.deepEqual(await gen().toArray(), [1, 2, 3])
 })
+
+test('AugmentedIterator.toArray does not restart the iteration', async t => {
+  const gen = augmentGenerator(async function * () {
+    yield 1
+    yield 2
+    yield 3
+  })
+
+  const it = gen()
+
+  await it.next()
+  t.deepEqual(await it.toArray(), [2, 3])
+})
