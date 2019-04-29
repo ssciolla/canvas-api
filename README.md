@@ -1,6 +1,6 @@
-# Canvas API
+# Canvas API client
 
-NodeJS interface for making requests to the [Canvas LMS API](https://canvas.instructure.com/doc/api/)
+NodeJS HTTP client based on [Request-Promise](https://github.com/request/request-promise) for the [Canvas LMS API](https://canvas.instructure.com/doc/api/)
 
 [![Build Status](https://travis-ci.org/KTH/canvas-api.svg?branch=master)](https://travis-ci.org/KTH/canvas-api)
 
@@ -10,10 +10,9 @@ NodeJS interface for making requests to the [Canvas LMS API](https://canvas.inst
 Once you build a canvas instance, you get an object with only four methods:
 
 1. The low-level `requestUrl()` method to perform any request with any HTTP method
-2. Three high-level methods for doing GET requests:
-   - `get()` to perform a GET request
-   - `list()` to perform a GET request and iterate through the results
-   - `listPaginated()` like *list()* but for iterating through pages
+2. `get()` to perform a GET request
+3. `list()` to perform a GET request and iterate through the results. Works for paginated responses.
+4. `listPaginated()` like *list()* but for iterating through pages
 
 ### Build the Canvas instance
 
@@ -51,7 +50,7 @@ for await (let course of canvas.list('/courses')) {
 }
 ```
 
-Use `listPaginated()` to get an iterable of **pages**
+Use `listPaginated()` to get an iterable of **pages** (you won't need this almost never)
 
 ```js
 for await (let page of canvas.listPaginated('/courses')) {
@@ -83,7 +82,7 @@ const courses = await canvas.list('/courses', {enrollment_type: 'teacher'})
 const pages = await canvas.listPaginated('/courses', {enrollment_type: 'teacher'})
 ```
 
-### Low-level `requestUrl` (for non-GET requests)
+### `requestUrl` (for non-GET requests)
 
 The method returns a full response (including headers, statusCode...)
 
