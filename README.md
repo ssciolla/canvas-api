@@ -1,6 +1,6 @@
-# Canvas API
+# Canvas API client
 
-NodeJS interface for making requests to the [Canvas LMS API](https://canvas.instructure.com/doc/api/)
+NodeJS HTTP client based on [Request-Promise](https://github.com/request/request-promise) for the [Canvas LMS API](https://canvas.instructure.com/doc/api/)
 
 [![Build Status](https://travis-ci.org/KTH/canvas-api.svg?branch=master)](https://travis-ci.org/KTH/canvas-api)
 
@@ -10,10 +10,9 @@ NodeJS interface for making requests to the [Canvas LMS API](https://canvas.inst
 Once you build a canvas instance, you get an object with only four methods:
 
 1. The low-level `requestUrl()` method to perform any request with any HTTP method
-2. Three high-level methods for doing GET requests:
-   - `get()` to perform a GET request
-   - `list()` to perform a GET request and iterate through the results
-   - `listPaginated()` like *list()* but for iterating through pages
+2. `get()` to perform a GET request
+3. `list()` to perform a GET request and iterate through the results. Works for paginated responses.
+4. `listPaginated()` like *list()* but for iterating through pages
 
 ### Build the Canvas instance
 
@@ -32,36 +31,44 @@ The builder function accepts three arguments:
 3. `options`. *optional* An object containing:
    - `log`. A function that will be called with logging messages. Default: empty function
 
-### Basic usage of `get()`, `list()` and `listPaginated()`
+### Get a single resource with `get()`
 
-Use `get()` to get a single resource
+Use `get()` to get a single resource. Get returns the whole response (not only its body)
 
 ``` js
-// This will return only the "first page".
-// Sometimes it's enough
-const courses = await canvas.get('/courses')
+const response = await canvas.get('/courses/1')
+const console.log(response.body.name)
 ```
 
-Use `list()` to get a list of resources and iterate through them. `list()` returns an async iterable that iterates for each element.
+### Get iterables with `list()` and `listPaginated()`
+
+Use `list()` to get an **iterable** of resources
 
 ``` js
-const courses = canvas.list('/courses')
-for await (let course of courses) {
+for await (let course of canvas.list('/courses')) {
   console.log(course.id)
 }
 ```
 
-Use `listPaginated()` to get a list of pages and iterate through them. `listPaginated()` returns an async iterable that iterates per page.
+Use `listPaginated()` to get an iterable of **pages** (you won't need this almost never)
 
 ```js
-const pages = canvas.listPaginated('/courses')
-
-for await (let page of pages) {
+for await (let page of canvas.listPaginated('/courses')) {
   // Each "page" is a list of courses
   console.log(page.length)
 }
 
 ```
+
+### Convert iterables to arrays with `.toArray()`
+
+Both `list()` and `listPaginated()` return special versions of iterables with a `toArray()` method. Use it to convert the iterables to arrays:
+
+``` javascript
+const courses = (await canvas.list('/courses').toArray())
+  .filter(c => c.id < 100)
+```
+
 
 ### Advanced usage
 
@@ -75,7 +82,7 @@ const courses = await canvas.list('/courses', {enrollment_type: 'teacher'})
 const pages = await canvas.listPaginated('/courses', {enrollment_type: 'teacher'})
 ```
 
-### Low-level `requestUrl` (for non-GET requests)
+### `requestUrl` (for non-GET requests)
 
 The method returns a full response (including headers, statusCode...)
 

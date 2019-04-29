@@ -1,4 +1,5 @@
 const rp = require('request-promise')
+const augmentGenerator = require('./lib/augmentGenerator')
 
 function removeToken (err) {
   delete err.error
@@ -100,7 +101,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
   return {
     requestUrl,
     get,
-    list,
-    listPaginated
+    list: augmentGenerator(list),
+    listPaginated: augmentGenerator(listPaginated)
   }
 }

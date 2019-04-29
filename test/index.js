@@ -72,6 +72,30 @@ test('List returns a correct iterable', async t => {
   t.deepEqual(result, [1, 2, 3, 4, 5])
 })
 
+test('List returns an Augmented iterable', async t => {
+  const SpecialCanvas = proxyquire('../index', {
+    'request-promise': function ({ url }) {
+      if (url === 'http://example.com/something') {
+        return {
+          body: [1, 2, 3],
+          headers: {
+            link: '<http://example.com/something_else>; rel="next", <irrelevant>; rel="first"'
+          }
+        }
+      } else if (url === 'http://example.com/something_else') {
+        return {
+          body: [4, 5]
+        }
+      }
+    }
+  })
+
+  const canvas = SpecialCanvas('http://example.com')
+  const result = await canvas.list('/something').toArray()
+
+  t.deepEqual(result, [1, 2, 3, 4, 5])
+})
+
 test('List ignores non-"rel=next" link headers', async t => {
   const SpecialCanvas = proxyquire('../index', {
     'request-promise': function ({ url }) {
