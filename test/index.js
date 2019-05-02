@@ -40,24 +40,15 @@ test('URLs are correctly "resolved"', async t => {
 })
 
 test('List returns a correct iterable', async t => {
-  const SpecialCanvas = proxyquire('../index', {
-    'request-promise': function ({ url }) {
-      if (url === 'http://example.com/something') {
-        return {
-          body: [1, 2, 3],
-          headers: {
-            link: '<http://example.com/something_else>; rel="next", <irrelevant>; rel="first"'
-          }
-        }
-      } else if (url === 'http://example.com/something_else') {
-        return {
-          body: [4, 5]
-        }
-      }
-    }
-  })
+  const server = await createTestServer()
 
-  const canvas = SpecialCanvas('http://example.com')
+  server.get('/something', (req, res) => {
+    res.set('Link', `<${server.url}/something_else>; rel="next", <irrelevant>; rel="first"`)
+    res.send([1, 2, 3])
+  })
+  server.get('/something_else', [4, 5])
+
+  const canvas = Canvas(server.url, '')
   const result = []
 
   for await (const e of canvas.list('/something')) {
