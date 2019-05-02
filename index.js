@@ -90,7 +90,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
 
         log(`Response from GET ${url}`)
         yield response.body
-        url = response.headers && getNextUrl(response.headers.link)
+        url = response.headers && response.headers.link && getNextUrl(response.headers.link)
         qs = null
       }
     } catch (err) {
