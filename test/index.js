@@ -23,8 +23,8 @@ test('URLs are correctly "resolved"', async t => {
   const urls = [
     { base: server.url, end: '/index' },
     { base: server.url, end: 'index' },
-    { base: server.url + '/', end: '/index' },
-    { base: server.url + '/', end: 'index' },
+    { base: `${server.url}/`, end: '/index' },
+    { base: `${server.url}/`, end: 'index' },
     { base: `${server.url}/api/v1`, end: '/courses/1' },
     { base: `${server.url}/api/v1`, end: 'courses/1' },
     { base: `${server.url}/api/v1/`, end: '/courses/1' },
