@@ -1,6 +1,6 @@
-const proxyquire = require('proxyquire').noCallThru()
-
 const test = require('ava')
+const createTestServer = require('create-test-server')
+
 const Canvas = require('../index')
 
 test('Token is correctly stripped', async t => {
@@ -16,53 +16,38 @@ test('Token is correctly stripped', async t => {
 })
 
 test('URLs are correctly "resolved"', async t => {
-  const urls = [
-    { base: 'http://example.com', end: '/index', expected: 'http://example.com/index' },
-    { base: 'http://example.com', end: 'index', expected: 'http://example.com/index' },
-    { base: 'http://example.com/', end: '/index', expected: 'http://example.com/index' },
-    { base: 'http://example.com/', end: 'index', expected: 'http://example.com/index' },
+  const server = await createTestServer()
+  server.get('/index', 'foo')
+  server.get('/api/v1/courses/1', 'foo')
 
-    { base: 'http://example.com/api/v1', end: '/courses/1', expected: 'http://example.com/api/v1/courses/1' },
-    { base: 'http://example.com/api/v1', end: 'courses/1', expected: 'http://example.com/api/v1/courses/1' },
-    { base: 'http://example.com/api/v1/', end: '/courses/1', expected: 'http://example.com/api/v1/courses/1' },
-    { base: 'http://example.com/api/v1/', end: 'courses/1', expected: 'http://example.com/api/v1/courses/1' }
+  const urls = [
+    { base: server.url, end: '/index' },
+    { base: server.url, end: 'index' },
+    { base: `${server.url}/`, end: '/index' },
+    { base: `${server.url}/`, end: 'index' },
+    { base: `${server.url}/api/v1`, end: '/courses/1' },
+    { base: `${server.url}/api/v1`, end: 'courses/1' },
+    { base: `${server.url}/api/v1/`, end: '/courses/1' },
+    { base: `${server.url}/api/v1/`, end: 'courses/1' }
   ]
 
-  for (const { base, end, expected } of urls) {
-    let spy
-    const SpecialCanvas = proxyquire('../index', {
-      'request-promise': function (obj) {
-        spy = obj.url
-        return []
-      }
-    })
-
-    const canvas = SpecialCanvas(base)
-    canvas.get(end)
-
-    t.is(spy, expected)
+  for (const { base, end } of urls) {
+    const canvas = Canvas(base, '')
+    const result = await canvas.get(end)
+    t.is(result.body, 'foo')
   }
 })
 
 test('List returns a correct iterable', async t => {
-  const SpecialCanvas = proxyquire('../index', {
-    'request-promise': function ({ url }) {
-      if (url === 'http://example.com/something') {
-        return {
-          body: [1, 2, 3],
-          headers: {
-            link: '<http://example.com/something_else>; rel="next", <irrelevant>; rel="first"'
-          }
-        }
-      } else if (url === 'http://example.com/something_else') {
-        return {
-          body: [4, 5]
-        }
-      }
-    }
-  })
+  const server = await createTestServer()
 
-  const canvas = SpecialCanvas('http://example.com')
+  server.get('/something', (req, res) => {
+    res.set('Link', `<${server.url}/something_else>; rel="next", <irrelevant>; rel="first"`)
+    res.send([1, 2, 3])
+  })
+  server.get('/something_else', [4, 5])
+
+  const canvas = Canvas(server.url, '')
   const result = []
 
   for await (const e of canvas.list('/something')) {
@@ -73,46 +58,29 @@ test('List returns a correct iterable', async t => {
 })
 
 test('List returns an Augmented iterable', async t => {
-  const SpecialCanvas = proxyquire('../index', {
-    'request-promise': function ({ url }) {
-      if (url === 'http://example.com/something') {
-        return {
-          body: [1, 2, 3],
-          headers: {
-            link: '<http://example.com/something_else>; rel="next", <irrelevant>; rel="first"'
-          }
-        }
-      } else if (url === 'http://example.com/something_else') {
-        return {
-          body: [4, 5]
-        }
-      }
-    }
-  })
+  const server = await createTestServer()
 
-  const canvas = SpecialCanvas('http://example.com')
+  server.get('/something', (req, res) => {
+    res.set('Link', `<${server.url}/something_else>; rel="next", <irrelevant>; rel="first"`)
+    res.send([1, 2, 3])
+  })
+  server.get('/something_else', [4, 5])
+
+  const canvas = Canvas(server.url, '')
   const result = await canvas.list('/something').toArray()
 
   t.deepEqual(result, [1, 2, 3, 4, 5])
 })
 
 test('List ignores non-"rel=next" link headers', async t => {
-  const SpecialCanvas = proxyquire('../index', {
-    'request-promise': function ({ url }) {
-      if (url === 'http://example.com/something') {
-        return {
-          body: [1],
-          headers: {
-            link: '<http://dont-call.com>; rel="last", <http://ignore-this.se>; rel="prev", <http://nope.com>; rel="first"'
-          }
-        }
-      } else {
-        t.fail(`The url: "${url}" was requested and should not be!`)
-      }
-    }
+  const server = await createTestServer()
+
+  server.get('/something', (req, res) => {
+    res.set('Link', '<http://dont-call.com>; rel="last", <http://ignore-this.se>; rel="prev", <http://nope.com>; rel="first"')
+    res.send([1])
   })
 
-  const canvas = SpecialCanvas('http://example.com')
+  const canvas = Canvas(server.url, '')
   const result = []
 
   for await (const e of canvas.list('/something')) {
@@ -122,29 +90,25 @@ test('List ignores non-"rel=next" link headers', async t => {
 })
 
 test('List can handle pagination urls with query strings', async t => {
-  const SpecialCanvas = proxyquire('../index', {
-    'request-promise': function ({ url, qs }) {
-      if (url === 'http://example.com/something') {
-        return {
-          body: [1, 2, 3],
-          headers: {
-            link: '<http://example.com/something_else?query=string>; rel="next", <irrelevant>; rel="first"'
-          }
-        }
-      } else if (url === 'http://example.com/something_else?query=string' && !qs) {
-        return {
-          body: [4, 5]
-        }
-      }
+  const server = await createTestServer()
+
+  server.get('/something', (req, res) => {
+    res.set('Link', `<${server.url}/something_else?query=string>; rel="next"`)
+    res.send([1])
+  })
+  server.get('/something_else', (req, res) => {
+    if (req.originalUrl === `/something_else?query=string`) {
+      res.send(['correct'])
+    } else {
+      res.send(['nope'])
     }
   })
 
-  const canvas = SpecialCanvas('http://example.com')
-  const result = []
+  const canvas = Canvas(server.url, '')
 
-  for await (const e of canvas.list('/something')) {
-    result.push(e)
-  }
+  const it = canvas.list('/something?with=query_string')
+  await it.next()
+  const result = await it.next()
 
-  t.deepEqual(result, [1, 2, 3, 4, 5])
+  t.is(result.value, 'correct')
 })
