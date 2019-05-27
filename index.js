@@ -1,4 +1,4 @@
-const rp = require('request-promise')
+const got = require('got')
 const augmentGenerator = require('./lib/augmentGenerator')
 
 function removeToken (err) {
@@ -25,21 +25,23 @@ module.exports = (apiUrl, apiKey, options = {}) => {
     return base2 + '/' + endpoint2
   }
 
-  async function requestUrl (endpoint, method = 'GET', parameters = {}, extra = {}) {
+  const canvasGot = got.extend({
+    headers: {
+      'Authorization': `Bearer ${apiKey}`
+    },
+    json: true
+  })
+
+  async function requestUrl (endpoint, method = 'GET', body = {}, options = {}) {
     const url = resolve(endpoint)
 
     log(`Request ${method} ${url}`)
     try {
-      const result = await rp({
-        json: true,
-        resolveWithFullResponse: true,
-        auth: {
-          bearer: apiKey
-        },
-        body: parameters,
+      const result = await canvasGot({
+        body: body,
         url,
         method,
-        ...extra
+        ...options
       })
 
       log(`Response from ${method} ${url}`)
@@ -49,12 +51,12 @@ module.exports = (apiUrl, apiKey, options = {}) => {
     }
   }
 
-  async function get (endpoint, parameters = {}) {
-    return requestUrl(endpoint, 'GET', {}, { qs: parameters })
+  async function get (endpoint, queryParams = {}) {
+    return requestUrl(endpoint, 'GET', {}, { query: queryParams })
   }
 
-  async function * list (endpoint, parameters = {}) {
-    for await (let page of listPaginated(endpoint, parameters)) {
+  async function * list (endpoint, queryParams = {}) {
+    for await (let page of listPaginated(endpoint, queryParams)) {
       log(`Traversing a page...`)
 
       for (let element of page) {
@@ -63,35 +65,22 @@ module.exports = (apiUrl, apiKey, options = {}) => {
     }
   }
 
-  async function * listPaginated (endpoint, parameters = {}) {
+  async function * listPaginated (endpoint, queryParams = {}) {
     try {
       let url = resolve(endpoint)
-      let qs = {
-        per_page: 100,
-        ...parameters
-      }
 
       while (url) {
         log(`Request GET ${url}`)
 
-        const response = await rp({
-          method: 'GET',
-          json: true,
-          resolveWithFullResponse: true,
-          auth: {
-            bearer: apiKey
-          },
-          qs,
-          qsStringifyOptions: {
-            arrayFormat: 'brackets'
-          },
+        const response = await canvasGot.get({
+          query: queryParams,
           url
         })
 
         log(`Response from GET ${url}`)
         yield response.body
         url = response.headers && response.headers.link && getNextUrl(response.headers.link)
-        qs = null
+        queryParams = null
       }
     } catch (err) {
       throw removeToken(err)
