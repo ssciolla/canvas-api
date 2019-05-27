@@ -2,8 +2,7 @@ const got = require('got')
 const augmentGenerator = require('./lib/augmentGenerator')
 
 function removeToken (err) {
-  delete err.error
-  delete err.options
+  delete err.gotOptions
   delete err.response
   return err
 }
