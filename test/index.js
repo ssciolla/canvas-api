@@ -17,8 +17,8 @@ test('Token is correctly stripped', async t => {
 
 test('URLs are correctly "resolved"', async t => {
   const server = await createTestServer()
-  server.get('/index', 'foo')
-  server.get('/api/v1/courses/1', 'foo')
+  server.get('/index', { 'foo': 'bar' })
+  server.get('/api/v1/courses/1', { 'foo': 'bar' })
 
   const urls = [
     { base: server.url, end: '/index' },
@@ -34,7 +34,7 @@ test('URLs are correctly "resolved"', async t => {
   for (const { base, end } of urls) {
     const canvas = Canvas(base, '')
     const result = await canvas.get(end)
-    t.is(result.body, 'foo')
+    t.is(result.body.foo, 'bar')
   }
 })
 
