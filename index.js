@@ -1,4 +1,5 @@
 const got = require('got')
+const queryString = require('query-string')
 const augmentGenerator = require('./lib/augmentGenerator')
 
 function removeToken (err) {
@@ -51,7 +52,10 @@ module.exports = (apiUrl, apiKey, options = {}) => {
   }
 
   async function get (endpoint, queryParams = {}) {
-    return requestUrl(endpoint, 'GET', {}, { query: queryParams })
+    const url = resolve(endpoint)
+
+    const query = queryString.stringify(queryParams, {arrayFormat: 'bracket'})
+    return canvasGot({url, method: 'GET', query})
   }
 
   async function * list (endpoint, queryParams = {}) {
@@ -67,19 +71,20 @@ module.exports = (apiUrl, apiKey, options = {}) => {
   async function * listPaginated (endpoint, queryParams = {}) {
     try {
       let url = resolve(endpoint)
+      let query = queryString.stringify(queryParams, {arrayFormat: 'bracket'})
 
       while (url) {
         log(`Request GET ${url}`)
 
         const response = await canvasGot.get({
-          query: queryParams,
+          query,
           url
         })
 
         log(`Response from GET ${url}`)
         yield response.body
         url = response.headers && response.headers.link && getNextUrl(response.headers.link)
-        queryParams = null
+        query = null
       }
     } catch (err) {
       throw removeToken(err)
