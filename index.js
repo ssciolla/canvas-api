@@ -32,12 +32,12 @@ module.exports = (apiUrl, apiKey, options = {}) => {
       const result = await canvasGot({
         baseUrl: apiUrl,
         body: body,
-        url,
+        url: endpoint,
         method,
         ...options
       })
 
-      log(`Response from ${method} ${url}`)
+      log(`Response from ${method} ${endpoint}`)
       return result
     } catch (err) {
       throw removeToken(err)
@@ -49,7 +49,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
       url: endpoint,
       baseUrl: apiUrl,
       method: 'GET',
-      query: queryString.stringify(queryParams, {arrayFormat: 'bracket'})
+      query: queryString.stringify(queryParams, { arrayFormat: 'bracket' })
     })
   }
 
@@ -65,7 +65,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
 
   async function * listPaginated (endpoint, queryParams = {}) {
     try {
-      let query = queryString.stringify(queryParams, {arrayFormat: 'bracket'})
+      let query = queryString.stringify(queryParams, { arrayFormat: 'bracket' })
       let first = await canvasGot.get({
         query,
         url: endpoint,
@@ -78,7 +78,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
       while (url) {
         log(`Request GET ${url}`)
 
-        const response = await canvasGot.get({url})
+        const response = await canvasGot.get({ url })
 
         log(`Response from GET ${url}`)
         yield response.body
