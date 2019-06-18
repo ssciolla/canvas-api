@@ -1,6 +1,6 @@
 # Canvas API client
 
-NodeJS HTTP client based on [Request-Promise](https://github.com/request/request-promise) for the [Canvas LMS API](https://canvas.instructure.com/doc/api/)
+NodeJS HTTP client based on [got](https://github.com/sindresorhus/got) for the [Canvas LMS API](https://canvas.instructure.com/doc/api/)
 
 [![Build Status](https://travis-ci.org/KTH/canvas-api.svg?branch=master)](https://travis-ci.org/KTH/canvas-api)
 
@@ -9,7 +9,7 @@ NodeJS HTTP client based on [Request-Promise](https://github.com/request/request
 
 Once you build a canvas instance, you get an object with only four methods:
 
-1. The low-level `requestUrl()` method to perform any request with any HTTP method
+1. The low-level `requestUrl()` method to perform a request with any HTTP method
 2. `get()` to perform a GET request
 3. `list()` to perform a GET request and iterate through the results. Works for paginated responses.
 4. `listPaginated()` like *list()* but for iterating through pages
@@ -33,7 +33,7 @@ The builder function accepts three arguments:
 
 ### Get a single resource with `get()`
 
-Use `get()` to get a single resource. Get returns the whole response (not only its body)
+Use `get()` to get a single resource. Get returns the whole response (not only its body). A query string can be supplied as a plain object, which will then be converted to a string using the [query-string](https://github.com/sindresorhus/query-string) package (bracket representation).
 
 ``` js
 const response = await canvas.get('/courses/1')
@@ -42,7 +42,7 @@ const console.log(response.body.name)
 
 ### Get iterables with `list()` and `listPaginated()`
 
-Use `list()` to get an **iterable** of resources
+Use `list()` to get an **iterable** of resources. A query string can be supplied as a plain object, which will then be converted to a string using the [query-string](https://github.com/sindresorhus/query-string) package (bracket representation).
 
 ``` js
 for await (let course of canvas.list('/courses')) {
@@ -50,7 +50,7 @@ for await (let course of canvas.list('/courses')) {
 }
 ```
 
-Use `listPaginated()` to get an iterable of **pages** (you won't need this almost never)
+Use `listPaginated()` to get an iterable of **pages** (you probably won't ever need this). A query string can be supplied as a plain object, which will then be converted to a string using the [query-string](https://github.com/sindresorhus/query-string) package (bracket representation).
 
 ```js
 for await (let page of canvas.listPaginated('/courses')) {
@@ -79,10 +79,11 @@ You can pass query parameters to the request with all the methods
 
 const courses = await canvas.get('/courses', {enrollment_type: 'teacher'})
 const courses = await canvas.list('/courses', {enrollment_type: 'teacher'})
-const pages = await canvas.listPaginated('/courses', {enrollment_type: 'teacher'})
+const pages = await canvas.listPaginated(`/courses/${courseId}/users`, new URLSearchParams([['include[]', 'avatar_url'], ['include[]', 'uuid']]))
+
 ```
 
-### `requestUrl` (for non-GET requests)
+### `requestUrl`
 
 The method returns a full response (including headers, statusCode...)
 
@@ -100,11 +101,13 @@ const response = await canvas.requestUrl('/courses', 'POST', body)
 
 ```
 
-You can use the fourth parameter to pass extra options to the request. Read the documentation of [Request](https://github.com/request/request) and [Request Promise](https://github.com/request/request-promise) libraries
+You can use the fourth parameter to pass extra options to the request. Read the documentation of [got](https://github.com/sindresorhus/got) for more information
 
 ``` js
 const options = {
-  resolveWithFullResponse: false
+  query: {
+    enrollment_state: 'completed'
+  }
 }
-const responseBody = await canvas.requestUrl('/courses', 'POST', body, options)
+const responseBody = await canvas.requestUrl('/courses', 'GET', {}, options)
 ```
