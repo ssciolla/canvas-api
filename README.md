@@ -33,7 +33,7 @@ The builder function accepts three arguments:
 
 ### Get a single resource with `get()`
 
-Use `get()` to get a single resource. Get returns the whole response (not only its body)
+Use `get()` to get a single resource. Get returns the whole response (not only its body). A query string can be supplied as a plain object, which will then be converted to a string using the [query-string](https://github.com/sindresorhus/query-string) package (bracket representation).
 
 ``` js
 const response = await canvas.get('/courses/1')
@@ -42,7 +42,7 @@ const console.log(response.body.name)
 
 ### Get iterables with `list()` and `listPaginated()`
 
-Use `list()` to get an **iterable** of resources
+Use `list()` to get an **iterable** of resources. A query string can be supplied as a plain object, which will then be converted to a string using the [query-string](https://github.com/sindresorhus/query-string) package (bracket representation).
 
 ``` js
 for await (let course of canvas.list('/courses')) {
@@ -50,7 +50,7 @@ for await (let course of canvas.list('/courses')) {
 }
 ```
 
-Use `listPaginated()` to get an iterable of **pages** (you probably won't ever need this)
+Use `listPaginated()` to get an iterable of **pages** (you probably won't ever need this). A query string can be supplied as a plain object, which will then be converted to a string using the [query-string](https://github.com/sindresorhus/query-string) package (bracket representation).
 
 ```js
 for await (let page of canvas.listPaginated('/courses')) {
