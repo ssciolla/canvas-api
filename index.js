@@ -29,6 +29,10 @@ module.exports = (apiUrl, apiKey, options = {}) => {
   async function requestUrl (endpoint, method = 'GET', body = {}, options = {}) {
     log(`Request ${method} ${endpoint}`)
 
+    if (method === 'GET') {
+      process.emitWarning('requestUrl() with "GET" methods is deprecated. Use get(), list() or listPaginated(). Use', 'DeprecationWarning')
+    }
+
     try {
       const result = await canvasGot({
         baseUrl: apiUrl,

@@ -8,7 +8,7 @@ test('Token is correctly stripped', async t => {
   const canvas = Canvas('https://kth.test.instructure.com/api/v1', 'My token')
 
   try {
-    await canvas.requestUrl('/accounts')
+    await canvas.get('/accounts')
   } catch (err) {
     const error = JSON.stringify(err)
     t.notRegex(error, /My token/)
