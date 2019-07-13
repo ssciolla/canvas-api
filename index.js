@@ -50,12 +50,17 @@ module.exports = (apiUrl, apiKey, options = {}) => {
   }
 
   async function get (endpoint, queryParams = {}) {
-    return canvasGot({
-      url: endpoint,
-      baseUrl: apiUrl,
-      method: 'GET',
-      query: queryString.stringify(queryParams, { arrayFormat: 'bracket' })
-    })
+    try {
+      const result = await canvasGot({
+        url: endpoint,
+        baseUrl: apiUrl,
+        method: 'GET',
+        query: queryString.stringify(queryParams, { arrayFormat: 'bracket' })
+      })
+      return result
+    } catch (err) {
+      throw removeToken(err)
+    }
   }
 
   async function * list (endpoint, queryParams = {}) {
