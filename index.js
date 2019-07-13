@@ -30,7 +30,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
     log(`Request ${method} ${endpoint}`)
 
     if (method === 'GET') {
-      process.emitWarning('requestUrl() with "GET" methods is deprecated. Use get(), list() or listPaginated(). Use', 'DeprecationWarning')
+      process.emitWarning('requestUrl() with "GET" methods is deprecated. Use get(), list() or listPaginated() instead.', 'DeprecationWarning')
     }
 
     try {
