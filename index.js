@@ -2,6 +2,7 @@ const got = require('got')
 const queryString = require('query-string')
 const augmentGenerator = require('./lib/augmentGenerator')
 const Joi = require('@hapi/joi')
+const debug = require('debug')('canvas-api')
 
 function removeToken (err) {
   delete err.gotOptions
@@ -17,6 +18,10 @@ function getNextUrl (linkHeader) {
 }
 
 module.exports = (apiUrl, apiKey, options = {}) => {
+  if (options.log) {
+    process.emitWarning('The "log" option is deprecated. Use DEBUG=canvas-api environment variable to enable debugging (more detailed)', 'DeprecationWarning')
+  }
+
   const log = options.log || (() => {})
 
   const canvasGot = got.extend({
@@ -28,6 +33,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
 
   async function requestUrl (endpoint, method = 'GET', body = {}, options = {}) {
     log(`Request ${method} ${endpoint}`)
+    debug(`requestUrl() ${method} ${endpoint}`)
 
     if (method === 'GET') {
       process.emitWarning('requestUrl() with "GET" methods is deprecated. Use get(), list() or listPaginated() instead.', 'DeprecationWarning')
@@ -42,14 +48,17 @@ module.exports = (apiUrl, apiKey, options = {}) => {
         ...options
       })
 
+      debug(`Successful request ${method} ${endpoint} - returning`)
       log(`Response from ${method} ${endpoint}`)
       return result
     } catch (err) {
+      debug(`Error in requestUrl() ${err.name}`)
       throw removeToken(err)
     }
   }
 
   async function get (endpoint, queryParams = {}) {
+    debug(`get() ${endpoint}`)
     try {
       const result = await canvasGot({
         url: endpoint,
@@ -57,17 +66,21 @@ module.exports = (apiUrl, apiKey, options = {}) => {
         method: 'GET',
         query: queryString.stringify(queryParams, { arrayFormat: 'bracket' })
       })
+      debug(`Response from get() ${endpoint}`)
       return result
     } catch (err) {
+      debug(`Error in get() ${err.name}`)
       throw removeToken(err)
     }
   }
 
   async function * list (endpoint, queryParams = {}) {
+    debug(`list() ${endpoint}`)
     for await (let page of listPaginated(endpoint, queryParams)) {
       Joi.assert(page, Joi.array(), `The function ".list()" should be used with endpoints that return arrays. Use "get()" instead with the endpoint ${endpoint}.`)
 
-      log(`Traversing a page...`)
+      log(`list() ${endpoint}. Traversing a page...`)
+      debug(`Traversing a page`)
 
       for (let element of page) {
         yield element
@@ -76,6 +89,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
   }
 
   async function * listPaginated (endpoint, queryParams = {}) {
+    debug(`listPaginated() ${endpoint}`)
     try {
       let query = queryString.stringify(queryParams, { arrayFormat: 'bracket' })
       let first = await canvasGot.get({
@@ -84,11 +98,14 @@ module.exports = (apiUrl, apiKey, options = {}) => {
         baseUrl: apiUrl
       })
 
+      debug(`listPaginated() ${endpoint} - Yielding first page`)
+
       yield first.body
       let url = first.headers && first.headers.link && getNextUrl(first.headers.link)
 
       while (url) {
         log(`Request GET ${url}`)
+        debug(`listPaginated() ${endpoint} - Requesting ${url}`)
 
         const response = await canvasGot.get({ url })
 
