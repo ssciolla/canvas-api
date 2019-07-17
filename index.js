@@ -104,7 +104,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
       url: endpoint,
       baseUrl: apiUrl,
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`
       },
       body: form
     })
