@@ -1,5 +1,7 @@
 const test = require('ava')
 const createTestServer = require('create-test-server')
+const fs = require('fs')
+const tempy = require('tempy')
 
 const Canvas = require('../index')
 
@@ -111,4 +113,24 @@ test('List can handle pagination urls with query strings', async t => {
   const result = await it.next()
 
   t.is(result.value, 'correct')
+})
+
+test('sendSis fails when file is missing', async t => {
+  const canvas = Canvas('https://example.instructure.com', 'Token')
+  await t.throwsAsync(() => canvas.sendSis('/some-endpoint', 'non-existing-file'))
+})
+
+
+test('sendSis returns a parsed JSON object upon success', async t => {
+  const server = await createTestServer()
+
+  server.post('/file', (req, res) => {
+    res.send({ key: 'value' })
+  })
+
+  const canvas = Canvas(server.url, '')
+  const tmp = tempy.file()
+  fs.writeFileSync(tmp, 'hello world')
+  const response = await canvas.sendSis('/file', tmp)
+  t.deepEqual(response.body, { key: 'value' })
 })
