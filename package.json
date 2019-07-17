@@ -1,6 +1,6 @@
 {
   "name": "@kth/canvas-api",
-  "version": "2.1.0-beta.0",
+  "version": "2.1.0-beta.1",
   "description": " Functions for communicating with Canvas LMS",
   "main": "index.js",
   "scripts": {
