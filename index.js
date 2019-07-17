@@ -100,14 +100,19 @@ module.exports = (apiUrl, apiKey, options = {}) => {
 
     form.append('attachment', fs.createReadStream(attachment))
 
-    return got.post({
-      url: endpoint,
-      baseUrl: apiUrl,
-      headers: {
-        Authorization: `Bearer ${apiKey}`
-      },
-      body: form
-    })
+    return got
+      .post({
+        url: endpoint,
+        baseUrl: apiUrl,
+        headers: {
+          Authorization: `Bearer ${apiKey}`
+        },
+        body: form
+      })
+      .then(response => {
+        response.body = JSON.parse(response.body)
+        return response
+      })
   }
 
   return {

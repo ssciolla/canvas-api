@@ -120,7 +120,6 @@ test('sendSis fails when file is missing', async t => {
   await t.throwsAsync(() => canvas.sendSis('/some-endpoint', 'non-existing-file'))
 })
 
-
 test('sendSis returns a parsed JSON object upon success', async t => {
   const server = await createTestServer()
 
