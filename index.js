@@ -1,6 +1,8 @@
 const got = require('got')
 const queryString = require('query-string')
 const augmentGenerator = require('./lib/augmentGenerator')
+const FormData = require('form-data')
+const fs = require('fs')
 
 function removeToken (err) {
   delete err.gotOptions
@@ -89,10 +91,30 @@ module.exports = (apiUrl, apiKey, options = {}) => {
     }
   }
 
+  async function sendSis (endpoint, attachment, body = {}) {
+    const form = new FormData()
+
+    for (const key in body) {
+      form.append(key, body[key])
+    }
+
+    form.append('attachment', fs.createReadStream(attachment))
+
+    return got.post({
+      url: endpoint,
+      baseUrl: apiUrl,
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: form
+    })
+  }
+
   return {
     requestUrl,
     get,
     list: augmentGenerator(list),
-    listPaginated: augmentGenerator(listPaginated)
+    listPaginated: augmentGenerator(listPaginated),
+    sendSis
   }
 }
