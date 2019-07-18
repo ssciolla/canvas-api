@@ -20,7 +20,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
 
   const canvasGot = got.extend({
     headers: {
-      'Authorization': `Bearer ${apiKey}`
+      Authorization: `Bearer ${apiKey}`
     },
     json: true
   })
@@ -54,10 +54,10 @@ module.exports = (apiUrl, apiKey, options = {}) => {
   }
 
   async function * list (endpoint, queryParams = {}) {
-    for await (let page of listPaginated(endpoint, queryParams)) {
+    for await (const page of listPaginated(endpoint, queryParams)) {
       log(`Traversing a page...`)
 
-      for (let element of page) {
+      for (const element of page) {
         yield element
       }
     }
@@ -65,8 +65,8 @@ module.exports = (apiUrl, apiKey, options = {}) => {
 
   async function * listPaginated (endpoint, queryParams = {}) {
     try {
-      let query = queryString.stringify(queryParams, { arrayFormat: 'bracket' })
-      let first = await canvasGot.get({
+      const query = queryString.stringify(queryParams, { arrayFormat: 'bracket' })
+      const first = await canvasGot.get({
         query,
         url: endpoint,
         baseUrl: apiUrl

@@ -17,8 +17,8 @@ test('Token is correctly stripped', async t => {
 
 test('URLs are correctly "resolved"', async t => {
   const server = await createTestServer()
-  server.get('/index', { 'foo': 'bar' })
-  server.get('/api/v1/courses/1', { 'foo': 'bar' })
+  server.get('/index', { foo: 'bar' })
+  server.get('/api/v1/courses/1', { foo: 'bar' })
 
   const urls = [
     { base: server.url, end: '/index' },
