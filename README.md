@@ -18,6 +18,8 @@ Once you build a canvas instance, you get an object with only four methods:
 
 ``` js
 const Canvas = require('kth-canvas-api')
+// You can alternatively use ES modules
+import Canvas from '@kth/canvas-api/esm'
 
 const url = 'https://xxx.instructure.com/api/v1'
 const token = 'AAAA~XXX'
