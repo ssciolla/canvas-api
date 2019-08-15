@@ -7,12 +7,13 @@ NodeJS HTTP client based on [got](https://github.com/sindresorhus/got) for the [
 
 ## How to use
 
-Once you build a canvas instance, you get an object with only four methods:
+Once you build a canvas instance, you get an object with only five methods:
 
 1. The low-level `requestUrl()` method to perform a request with any HTTP method
 2. `get()` to perform a GET request
 3. `list()` to perform a GET request and iterate through the results. Works for paginated responses.
 4. `listPaginated()` like *list()* but for iterating through pages
+5. `sendSis()` to perform a POST request attaching a file.
 
 ### Build the Canvas instance
 
@@ -67,6 +68,19 @@ Both `list()` and `listPaginated()` return special versions of iterables with a 
 ``` javascript
 const courses = (await canvas.list('/courses').toArray())
   .filter(c => c.id < 100)
+```
+
+### Send CSV attachments with `sendSis(endpoint, attachment, body)`
+
+Use this function to send a single file as attachment. Pass the path of that file as the `attachment` parameter.
+
+You can include also any extra parameters using `body`. However, make sure that you don't pass any value with `attachment` key since that is the name of the field for the actual attachment.
+
+The request is going to be sent as `multipart/form-data`. And the response will be parsed as JSON:
+
+```javascript
+const {body} = (await canvas.sendSis('/accounts/1/sis_import', 'enrollments.csv', {})
+console.log(body.id)
 ```
 
 
