@@ -8,7 +8,7 @@ test('Token is correctly stripped', async t => {
   const canvas = Canvas('https://kth.test.instructure.com/api/v1', 'My token')
 
   try {
-    await canvas.requestUrl('/accounts')
+    await canvas.get('/accounts')
   } catch (err) {
     const error = JSON.stringify(err)
     t.notRegex(error, /My token/)
@@ -111,4 +111,17 @@ test('List can handle pagination urls with query strings', async t => {
   const result = await it.next()
 
   t.is(result.value, 'correct')
+})
+
+test('List throws a descriptive error if the endpoint response is not an array', async t => {
+  const server = await createTestServer()
+
+  server.get('/not-a-list', (req, res) => {
+    res.send({ x: 1 })
+  })
+
+  const canvas = Canvas(server.url, '')
+  const it = canvas.list('/not-a-list')
+
+  await t.throwsAsync(() => it.next(), { name: 'ValidationError' })
 })
