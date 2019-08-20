@@ -66,7 +66,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
   async function * list (endpoint, queryParams = {}) {
     for await (const page of listPaginated(endpoint, queryParams)) {
       Joi.assert(page, Joi.array(), `The function ".list()" should be used with endpoints that return arrays. Use "get()" instead with the endpoint ${endpoint}.`)
-      
+
       log(`Traversing a page...`)
 
       for (const element of page) {
