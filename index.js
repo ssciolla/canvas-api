@@ -3,6 +3,7 @@ const queryString = require('query-string')
 const augmentGenerator = require('./lib/augmentGenerator')
 const FormData = require('form-data')
 const fs = require('fs')
+const Joi = require('@hapi/joi')
 
 function removeToken (err) {
   delete err.gotOptions
@@ -30,6 +31,10 @@ module.exports = (apiUrl, apiKey, options = {}) => {
   async function requestUrl (endpoint, method = 'GET', body = {}, options = {}) {
     log(`Request ${method} ${endpoint}`)
 
+    if (method === 'GET') {
+      process.emitWarning('requestUrl() with "GET" methods is deprecated. Use get(), list() or listPaginated() instead.', 'DeprecationWarning')
+    }
+
     try {
       const result = await canvasGot({
         baseUrl: apiUrl,
@@ -47,16 +52,23 @@ module.exports = (apiUrl, apiKey, options = {}) => {
   }
 
   async function get (endpoint, queryParams = {}) {
-    return canvasGot({
-      url: endpoint,
-      baseUrl: apiUrl,
-      method: 'GET',
-      query: queryString.stringify(queryParams, { arrayFormat: 'bracket' })
-    })
+    try {
+      const result = await canvasGot({
+        url: endpoint,
+        baseUrl: apiUrl,
+        method: 'GET',
+        query: queryString.stringify(queryParams, { arrayFormat: 'bracket' })
+      })
+      return result
+    } catch (err) {
+      throw removeToken(err)
+    }
   }
 
   async function * list (endpoint, queryParams = {}) {
     for await (const page of listPaginated(endpoint, queryParams)) {
+      Joi.assert(page, Joi.array(), `The function ".list()" should be used with endpoints that return arrays. Use "get()" instead with the endpoint ${endpoint}.`)
+
       log(`Traversing a page...`)
 
       for (const element of page) {
