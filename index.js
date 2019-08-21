@@ -112,13 +112,11 @@ module.exports = (apiUrl, apiKey, options = {}) => {
 
     form.append('attachment', fs.createReadStream(attachment))
 
-    return got
+    return canvasGot
       .post({
         url: endpoint,
         baseUrl: apiUrl,
-        headers: {
-          Authorization: `Bearer ${apiKey}`
-        },
+        json: false,
         body: form
       })
       .then(response => {
