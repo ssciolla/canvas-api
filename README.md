@@ -79,7 +79,7 @@ You can include also any extra parameters using `body`. However, make sure that 
 The request is going to be sent as `multipart/form-data`. And the response will be parsed as JSON:
 
 ```javascript
-const {body} = (await canvas.sendSis('/accounts/1/sis_import', 'enrollments.csv', {})
+const {body} = await canvas.sendSis('/accounts/1/sis_imports', 'enrollments.csv', {})
 console.log(body.id)
 ```
 
