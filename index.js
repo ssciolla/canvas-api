@@ -1,6 +1,8 @@
 const got = require('got')
 const queryString = require('query-string')
 const augmentGenerator = require('./lib/augmentGenerator')
+const FormData = require('form-data')
+const fs = require('fs')
 const Joi = require('@hapi/joi')
 const debug = require('debug')('canvas-api')
 
@@ -26,7 +28,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
 
   const canvasGot = got.extend({
     headers: {
-      'Authorization': `Bearer ${apiKey}`
+      Authorization: `Bearer ${apiKey}`
     },
     json: true
   })
@@ -76,13 +78,14 @@ module.exports = (apiUrl, apiKey, options = {}) => {
 
   async function * list (endpoint, queryParams = {}) {
     debug(`list() ${endpoint}`)
-    for await (let page of listPaginated(endpoint, queryParams)) {
+
+    for await (const page of listPaginated(endpoint, queryParams)) {
       Joi.assert(page, Joi.array(), `The function ".list()" should be used with endpoints that return arrays. Use "get()" instead with the endpoint ${endpoint}.`)
 
       log(`list() ${endpoint}. Traversing a page...`)
       debug(`Traversing a page`)
 
-      for (let element of page) {
+      for (const element of page) {
         yield element
       }
     }
@@ -91,8 +94,8 @@ module.exports = (apiUrl, apiKey, options = {}) => {
   async function * listPaginated (endpoint, queryParams = {}) {
     debug(`listPaginated() ${endpoint}`)
     try {
-      let query = queryString.stringify(queryParams, { arrayFormat: 'bracket' })
-      let first = await canvasGot.get({
+      const query = queryString.stringify(queryParams, { arrayFormat: 'bracket' })
+      const first = await canvasGot.get({
         query,
         url: endpoint,
         baseUrl: apiUrl
@@ -118,10 +121,33 @@ module.exports = (apiUrl, apiKey, options = {}) => {
     }
   }
 
+  async function sendSis (endpoint, attachment, body = {}) {
+    const form = new FormData()
+
+    for (const key in body) {
+      form.append(key, body[key])
+    }
+
+    form.append('attachment', fs.createReadStream(attachment))
+
+    return canvasGot
+      .post({
+        url: endpoint,
+        baseUrl: apiUrl,
+        json: false,
+        body: form
+      })
+      .then(response => {
+        response.body = JSON.parse(response.body)
+        return response
+      })
+  }
+
   return {
     requestUrl,
     get,
     list: augmentGenerator(list),
-    listPaginated: augmentGenerator(listPaginated)
+    listPaginated: augmentGenerator(listPaginated),
+    sendSis
   }
 }
