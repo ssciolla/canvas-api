@@ -1,6 +1,8 @@
 const got = require('got')
 const queryString = require('query-string')
 const augmentGenerator = require('./lib/augmentGenerator')
+const FormData = require('form-data')
+const fs = require('fs')
 const Joi = require('@hapi/joi')
 
 function removeToken (err) {
@@ -101,10 +103,33 @@ module.exports = (apiUrl, apiKey, options = {}) => {
     }
   }
 
+  async function sendSis (endpoint, attachment, body = {}) {
+    const form = new FormData()
+
+    for (const key in body) {
+      form.append(key, body[key])
+    }
+
+    form.append('attachment', fs.createReadStream(attachment))
+
+    return canvasGot
+      .post({
+        url: endpoint,
+        baseUrl: apiUrl,
+        json: false,
+        body: form
+      })
+      .then(response => {
+        response.body = JSON.parse(response.body)
+        return response
+      })
+  }
+
   return {
     requestUrl,
     get,
     list: augmentGenerator(list),
-    listPaginated: augmentGenerator(listPaginated)
+    listPaginated: augmentGenerator(listPaginated),
+    sendSis
   }
 }
