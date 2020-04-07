@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test-style": "standard",
-    "test": "ava"
+    "test": "ava",
+    "build": "npm test"
   },
   "exports": {
     "./esm": "./esm/index.mjs"
