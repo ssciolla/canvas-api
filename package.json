@@ -15,7 +15,11 @@
     "type": "git",
     "url": "https://github.com/kth/canvas-api"
   },
-  "author": "emilsten@kth.se",
+  "author": {
+    "name": "KTH",
+    "email": "vc.developers@kth.se",
+    "url": "https://github.com/KTH"
+  },
   "license": "MIT",
   "dependencies": {
     "@hapi/joi": "^15.1.0",
