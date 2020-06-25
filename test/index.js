@@ -99,7 +99,7 @@ test('List can handle pagination urls with query strings', async t => {
     res.send([1])
   })
   server.get('/something_else', (req, res) => {
-    if (req.originalUrl === `/something_else?query=string`) {
+    if (req.originalUrl === '/something_else?query=string') {
       res.send(['correct'])
     } else {
       res.send(['nope'])

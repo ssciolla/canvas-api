@@ -83,7 +83,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
       Joi.assert(page, Joi.array(), `The function ".list()" should be used with endpoints that return arrays. Use "get()" instead with the endpoint ${endpoint}.`)
 
       log(`list() ${endpoint}. Traversing a page...`)
-      debug(`Traversing a page`)
+      debug('Traversing a page')
 
       for (const element of page) {
         yield element
