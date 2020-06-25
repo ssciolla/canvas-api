@@ -3,6 +3,7 @@ node_js:
   - "node"
   - "lts/*"
   - "10"
+  - "12"
 script:
   - npm run test-style
   - npm test
