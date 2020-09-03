@@ -4,8 +4,8 @@
   "description": " Functions for communicating with Canvas LMS",
   "main": "index.js",
   "scripts": {
-    "test-style": "standard",
-    "test": "ava",
+    "format": "standard --fix",
+    "test": "standard && ava",
     "build": "npm test"
   },
   "exports": {

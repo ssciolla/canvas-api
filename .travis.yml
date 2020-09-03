@@ -5,5 +5,4 @@ node_js:
   - "10"
   - "12"
 script:
-  - npm run test-style
   - npm test
