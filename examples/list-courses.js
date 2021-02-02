@@ -1,35 +1,40 @@
-require('dotenv').config()
-const Canvas = require('../index')
-const ora = require('ora')
+require("dotenv").config();
+const Canvas = require("../index");
+const ora = require("ora");
 
-async function start () {
+async function start() {
   console.log(
-    'Checking environmental variables...\n' +
-    `- CANVAS_API_URL: ${process.env.CANVAS_API_URL}\n` +
-    `- CANVAS_API_TOKEN: ${process.env.CANVAS_API_TOKEN ? '<not showing>' : 'not set'}`
-  )
-  console.log()
-  console.log('Making paginated GET requests to /accounts/1/courses')
-  console.log('Stop with Ctrl+C')
-  const limit = 300
-  const canvas = Canvas(process.env.CANVAS_API_URL, process.env.CANVAS_API_TOKEN)
+    "Checking environmental variables...\n" +
+      `- CANVAS_API_URL: ${process.env.CANVAS_API_URL}\n` +
+      `- CANVAS_API_TOKEN: ${
+        process.env.CANVAS_API_TOKEN ? "<not showing>" : "not set"
+      }`
+  );
+  console.log();
+  console.log("Making paginated GET requests to /accounts/1/courses");
+  console.log("Stop with Ctrl+C");
+  const limit = 300;
+  const canvas = Canvas(
+    process.env.CANVAS_API_URL,
+    process.env.CANVAS_API_TOKEN
+  );
 
-  const spinner = ora(`Getting courses... 0/${limit}`).start()
+  const spinner = ora(`Getting courses... 0/${limit}`).start();
   try {
-    let count = 0
-    for await (const course of canvas.list('/accounts/1/courses')) {
-      count++
+    let count = 0;
+    for await (const course of canvas.list("/accounts/1/courses")) {
+      count++;
       if (count >= limit) {
-        break
+        break;
       }
-      spinner.text = `Getting courses... ${count}/${limit}. ${course.name}`
+      spinner.text = `Getting courses... ${count}/${limit}. ${course.name}`;
     }
-    spinner.stop()
-    console.log('List through 300 courses complete')
+    spinner.stop();
+    console.log("List through 300 courses complete");
   } catch (err) {
-    spinner.stop()
-    console.error(err)
+    spinner.stop();
+    console.error(err);
   }
 }
 
-start()
+start();

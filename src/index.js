@@ -1,44 +1,52 @@
-const got = require('got')
-const queryString = require('query-string')
-const augmentGenerator = require('./augmentGenerator')
-const FormData = require('form-data')
-const fs = require('fs')
-const Joi = require('@hapi/joi')
-const debug = require('debug')('canvas-api')
+const got = require("got");
+const queryString = require("query-string");
+const augmentGenerator = require("./augmentGenerator");
+const FormData = require("form-data");
+const fs = require("fs");
+const Joi = require("@hapi/joi");
+const debug = require("debug")("canvas-api");
 
-function removeToken (err) {
-  delete err.gotOptions
-  delete err.response
-  return err
+function removeToken(err) {
+  delete err.gotOptions;
+  delete err.response;
+  return err;
 }
 
-function getNextUrl (linkHeader) {
-  const next = linkHeader.split(',').find(l => l.search(/rel="next"$/) !== -1)
+function getNextUrl(linkHeader) {
+  const next = linkHeader
+    .split(",")
+    .find((l) => l.search(/rel="next"$/) !== -1);
 
-  const url = next && next.match(/<(.*?)>/)
-  return url && url[1]
+  const url = next && next.match(/<(.*?)>/);
+  return url && url[1];
 }
 
 module.exports = (apiUrl, apiKey, options = {}) => {
   if (options.log) {
-    process.emitWarning('The "log" option is deprecated. Use DEBUG=canvas-api environment variable to enable debugging (more detailed)', 'DeprecationWarning')
+    process.emitWarning(
+      'The "log" option is deprecated. Use DEBUG=canvas-api environment variable to enable debugging (more detailed)',
+      "DeprecationWarning"
+    );
   }
 
-  const log = options.log || (() => {})
+  const log = options.log || (() => {});
 
   const canvasGot = got.extend({
     headers: {
-      Authorization: `Bearer ${apiKey}`
+      Authorization: `Bearer ${apiKey}`,
     },
-    json: true
-  })
+    json: true,
+  });
 
-  async function requestUrl (endpoint, method = 'GET', body = {}, options = {}) {
-    log(`Request ${method} ${endpoint}`)
-    debug(`requestUrl() ${method} ${endpoint}`)
+  async function requestUrl(endpoint, method = "GET", body = {}, options = {}) {
+    log(`Request ${method} ${endpoint}`);
+    debug(`requestUrl() ${method} ${endpoint}`);
 
-    if (method === 'GET') {
-      process.emitWarning('requestUrl() with "GET" methods is deprecated. Use get(), list() or listPaginated() instead.', 'DeprecationWarning')
+    if (method === "GET") {
+      process.emitWarning(
+        'requestUrl() with "GET" methods is deprecated. Use get(), list() or listPaginated() instead.',
+        "DeprecationWarning"
+      );
     }
 
     try {
@@ -47,100 +55,110 @@ module.exports = (apiUrl, apiKey, options = {}) => {
         body: body,
         url: endpoint,
         method,
-        ...options
-      })
+        ...options,
+      });
 
-      debug(`Successful request ${method} ${endpoint} - returning`)
-      log(`Response from ${method} ${endpoint}`)
-      return result
+      debug(`Successful request ${method} ${endpoint} - returning`);
+      log(`Response from ${method} ${endpoint}`);
+      return result;
     } catch (err) {
-      debug(`Error in requestUrl() ${err.name}`)
-      throw removeToken(err)
+      debug(`Error in requestUrl() ${err.name}`);
+      throw removeToken(err);
     }
   }
 
-  async function get (endpoint, queryParams = {}) {
-    debug(`get() ${endpoint}`)
+  async function get(endpoint, queryParams = {}) {
+    debug(`get() ${endpoint}`);
     try {
       const result = await canvasGot({
         url: endpoint,
         baseUrl: apiUrl,
-        method: 'GET',
-        query: queryString.stringify(queryParams, { arrayFormat: 'bracket' })
-      })
-      debug(`Response from get() ${endpoint}`)
-      return result
+        method: "GET",
+        query: queryString.stringify(queryParams, { arrayFormat: "bracket" }),
+      });
+      debug(`Response from get() ${endpoint}`);
+      return result;
     } catch (err) {
-      debug(`Error in get() ${err.name}`)
-      throw removeToken(err)
+      debug(`Error in get() ${err.name}`);
+      throw removeToken(err);
     }
   }
 
-  async function * list (endpoint, queryParams = {}) {
-    debug(`list() ${endpoint}`)
+  async function* list(endpoint, queryParams = {}) {
+    debug(`list() ${endpoint}`);
 
     for await (const page of listPaginated(endpoint, queryParams)) {
-      Joi.assert(page, Joi.array(), `The function ".list()" should be used with endpoints that return arrays. Use "get()" instead with the endpoint ${endpoint}.`)
+      Joi.assert(
+        page,
+        Joi.array(),
+        `The function ".list()" should be used with endpoints that return arrays. Use "get()" instead with the endpoint ${endpoint}.`
+      );
 
-      log(`list() ${endpoint}. Traversing a page...`)
-      debug('Traversing a page')
+      log(`list() ${endpoint}. Traversing a page...`);
+      debug("Traversing a page");
 
       for (const element of page) {
-        yield element
+        yield element;
       }
     }
   }
 
-  async function * listPaginated (endpoint, queryParams = {}) {
-    debug(`listPaginated() ${endpoint}`)
+  async function* listPaginated(endpoint, queryParams = {}) {
+    debug(`listPaginated() ${endpoint}`);
     try {
-      const query = queryString.stringify(queryParams, { arrayFormat: 'bracket' })
+      const query = queryString.stringify(queryParams, {
+        arrayFormat: "bracket",
+      });
       const first = await canvasGot.get({
         query,
         url: endpoint,
-        baseUrl: apiUrl
-      })
+        baseUrl: apiUrl,
+      });
 
-      debug(`listPaginated() ${endpoint} - Yielding first page`)
+      debug(`listPaginated() ${endpoint} - Yielding first page`);
 
-      yield first.body
-      let url = first.headers && first.headers.link && getNextUrl(first.headers.link)
+      yield first.body;
+      let url =
+        first.headers && first.headers.link && getNextUrl(first.headers.link);
 
       while (url) {
-        log(`Request GET ${url}`)
-        debug(`listPaginated() ${endpoint} - Requesting ${url}`)
+        log(`Request GET ${url}`);
+        debug(`listPaginated() ${endpoint} - Requesting ${url}`);
 
-        const response = await canvasGot.get({ url })
+        const response = await canvasGot.get({ url });
 
-        log(`Response from GET ${url}`)
-        yield response.body
-        url = response.headers && response.headers.link && getNextUrl(response.headers.link)
+        log(`Response from GET ${url}`);
+        yield response.body;
+        url =
+          response.headers &&
+          response.headers.link &&
+          getNextUrl(response.headers.link);
       }
     } catch (err) {
-      throw removeToken(err)
+      throw removeToken(err);
     }
   }
 
-  async function sendSis (endpoint, attachment, body = {}) {
-    const form = new FormData()
+  async function sendSis(endpoint, attachment, body = {}) {
+    const form = new FormData();
 
     for (const key in body) {
-      form.append(key, body[key])
+      form.append(key, body[key]);
     }
 
-    form.append('attachment', fs.createReadStream(attachment))
+    form.append("attachment", fs.createReadStream(attachment));
 
     return canvasGot
       .post({
         url: endpoint,
         baseUrl: apiUrl,
         json: false,
-        body: form
+        body: form,
       })
-      .then(response => {
-        response.body = JSON.parse(response.body)
-        return response
-      })
+      .then((response) => {
+        response.body = JSON.parse(response.body);
+        return response;
+      });
   }
 
   return {
@@ -148,6 +166,6 @@ module.exports = (apiUrl, apiKey, options = {}) => {
     get,
     list: augmentGenerator(list),
     listPaginated: augmentGenerator(listPaginated),
-    sendSis
-  }
-}
+    sendSis,
+  };
+};

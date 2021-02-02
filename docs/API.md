@@ -8,24 +8,23 @@ CanvasAPI instance methods:
 
 - [**get(endpoint, queryParams)**](#CanvasApi-get) : Promise
 
-    Perform a GET request to the `endpoint`
+  Perform a GET request to the `endpoint`
 
 - [**list(endpoint, queryParams)**](#CanvasApi-list) : ExtendedAsyncIterator
 
-    Returns an iterable of elements returned by `endpoint` and its following pages.
+  Returns an iterable of elements returned by `endpoint` and its following pages.
 
 - [**listPaginated(endpoint, queryParams)**](#CanvasApi-listPaginated) : ExtendedAsyncIterator
 
-    Returns an iterable of pages (list of elements) returned by `endpoint` and its following pages.
+  Returns an iterable of pages (list of elements) returned by `endpoint` and its following pages.
 
 - [**sendSis(endpoint, attachment, body)**](#CanvasApi-sendSis) : Promise
 
-    Perform a POST request to the `endpoint` including the `attachment` as attachment
+  Perform a POST request to the `endpoint` including the `attachment` as attachment
 
 - [**requestUrl(endpoint, method, body, options)**](#CanvasApi-requestUrl) : Promise
 
-    Perform non-GET requests to the `endpoint`
-
+  Perform non-GET requests to the `endpoint`
 
 # Global functions
 
@@ -39,7 +38,7 @@ Creates and returns a Canvas API instance. Arguments:
 - `token`. Canvas API user token. Can be generated manually or via Oauth. [Read more in the Canvas API documentation](https://canvas.instructure.com/doc/api/file.oauth.html#accessing-canvas-api)
 
 ```js
-const canvas = Canvas('https://xxx.instructure.com/api/v1', 'AAAA~XXX')
+const canvas = Canvas("https://xxx.instructure.com/api/v1", "AAAA~XXX");
 ```
 
 # CanvasAPI instance methods
@@ -56,7 +55,7 @@ Perform a GET request to the `endpoint`. Arguments:
 Returns a promise of an object with the response of the API operation including the properties `body`, `headers` and `statusCode`
 
 ```js
-const { body, headers, statusCode } = await canvas.get('/accounts/1')
+const { body, headers, statusCode } = await canvas.get("/accounts/1");
 ```
 
 <a href="" id="CanvasApi-list"></a>
@@ -71,7 +70,7 @@ Perform a GET request to the `endpoint` and to the following pages. Returns an i
 Returns an asynchronous iterable:
 
 ```js
-const courses = canvas.list('/courses')
+const courses = canvas.list("/courses");
 for await (let course of courses) {
   //...
 }
@@ -80,7 +79,7 @@ for await (let course of courses) {
 You can easily convert the iterable to an array with the `toArray()` method:
 
 ```js
-const courses = await canvas.list('/courses').toArray()
+const courses = await canvas.list("/courses").toArray();
 ```
 
 #### Notes
@@ -99,7 +98,7 @@ Perform a GET request to the `endpoint` and to the following pages. Returns an i
 Returns an asynchronous iterable:
 
 ```js
-const courses = canvas.listPaginated('/courses')
+const courses = canvas.listPaginated("/courses");
 for await (let page of courses) {
   //...
 }
@@ -108,7 +107,7 @@ for await (let page of courses) {
 You can easily convert the iterable to an array with the `toArray()` method:
 
 ```js
-const pages = await canvas.list('/courses').toArray()
+const pages = await canvas.list("/courses").toArray();
 ```
 
 <a href="" id="CanvasApi-sendSis"></a>
@@ -134,5 +133,5 @@ Perform a non-GET (i.e. POST, PUT, DELETE, etc.) request to the `endpoint`. Argu
 Returns a promise of an object with the response of the API operation including the properties `body`, `headers` and `statusCode`
 
 ```js
-const { body, headers, statusCode } = await canvas.post('/accounts', 'POST')
+const { body, headers, statusCode } = await canvas.post("/accounts", "POST");
 ```

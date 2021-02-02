@@ -4,8 +4,9 @@
   "description": " Functions for communicating with Canvas LMS",
   "main": "src/index.js",
   "scripts": {
-    "format": "standard --fix",
-    "test": "standard && ava",
+    "format": "prettier --write .",
+    "test": "npm run test:lint && ava",
+    "test:lint": "eslint src && prettier --check .",
     "build": "npm test"
   },
   "exports": {
