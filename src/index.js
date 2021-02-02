@@ -1,6 +1,6 @@
 const got = require('got')
 const queryString = require('query-string')
-const augmentGenerator = require('./lib/augmentGenerator')
+const augmentGenerator = require('./augmentGenerator')
 const FormData = require('form-data')
 const fs = require('fs')
 const Joi = require('@hapi/joi')

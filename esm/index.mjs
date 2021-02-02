@@ -1,2 +1,2 @@
-import Canvas from '../index.js'
+import Canvas from '../src/index.js'
 export default Canvas
