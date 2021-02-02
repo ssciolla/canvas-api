@@ -21,6 +21,16 @@ function getNextUrl(linkHeader) {
   return url && url[1];
 }
 
+function emitLeadingSlashWarning(endpoint) {
+  if (endpoint.startsWith("/")) {
+    process.emitWarning(
+      `URLs with leading slash are deprecated. Replace '${endpoint}' with '${endpoint.slice(
+        1
+      )}'`
+    );
+  }
+}
+
 module.exports = (apiUrl, apiKey, options = {}) => {
   if (options.log) {
     process.emitWarning(
@@ -41,6 +51,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
   async function requestUrl(endpoint, method = "GET", body = {}, options = {}) {
     log(`Request ${method} ${endpoint}`);
     debug(`requestUrl() ${method} ${endpoint}`);
+    emitLeadingSlashWarning(endpoint);
 
     if (method === "GET") {
       process.emitWarning(
@@ -68,6 +79,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
   }
 
   async function get(endpoint, queryParams = {}) {
+    emitLeadingSlashWarning(endpoint);
     debug(`get() ${endpoint}`);
     try {
       const result = await canvasGot({
@@ -85,6 +97,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
   }
 
   async function* list(endpoint, queryParams = {}) {
+    emitLeadingSlashWarning(endpoint);
     debug(`list() ${endpoint}`);
 
     for await (const page of listPaginated(endpoint, queryParams)) {
@@ -104,6 +117,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
   }
 
   async function* listPaginated(endpoint, queryParams = {}) {
+    emitLeadingSlashWarning(endpoint);
     debug(`listPaginated() ${endpoint}`);
     try {
       const query = queryString.stringify(queryParams, {
@@ -140,6 +154,7 @@ module.exports = (apiUrl, apiKey, options = {}) => {
   }
 
   async function sendSis(endpoint, attachment, body = {}) {
+    emitLeadingSlashWarning(endpoint);
     const form = new FormData();
 
     for (const key in body) {
