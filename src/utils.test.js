@@ -1,5 +1,5 @@
 const test = require("ava");
-const augmentGenerator = require("./augmentGenerator");
+const { augmentGenerator } = require("./utils");
 
 test("augmentGenerator does not mutate the original generator", (t) => {
   async function* gen() {
@@ -16,32 +16,32 @@ test("augmentGenerator returns a valid generator", async (t) => {
     yield 1;
   }
 
-  const g2 = augmentGenerator(gen);
+  const g2 = augmentGenerator(gen());
 
-  for await (const v of g2()) {
+  for await (const v of g2) {
     t.is(v, 1);
   }
 });
 
 test("AugmentedIterator.toArray works without arguments", async (t) => {
-  const gen = augmentGenerator(async function* () {
+  async function* gen() {
     yield 1;
     yield 2;
     yield 3;
-  });
+  }
+  const gen2 = augmentGenerator(gen());
 
-  t.deepEqual(await gen().toArray(), [1, 2, 3]);
+  t.deepEqual(await gen2.toArray(), [1, 2, 3]);
 });
 
 test("AugmentedIterator.toArray does not restart the iteration", async (t) => {
-  const gen = augmentGenerator(async function* () {
+  async function* gen() {
     yield 1;
     yield 2;
     yield 3;
-  });
+  }
+  const gen2 = augmentGenerator(gen());
 
-  const it = gen();
-
-  await it.next();
-  t.deepEqual(await it.toArray(), [2, 3]);
+  await gen2.next();
+  t.deepEqual(await gen2.toArray(), [2, 3]);
 });

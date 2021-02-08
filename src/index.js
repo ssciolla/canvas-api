@@ -2,6 +2,7 @@ const got = require("got");
 const queryString = require("query-string");
 const FormData = require("form-data");
 const fs = require("fs");
+const { augmentGenerator } = require("./utils");
 
 function removeToken(err) {
   delete err.gotOptions;
@@ -64,12 +65,13 @@ module.exports = class CanvasAPI {
     }
   }
 
-  async *_listPaginated(endpoint, queryParams = {}) {
+  async *_listPaginated(endpoint, queryParams = {}, options = {}) {
     try {
       const first = await this.gotClient.get(endpoint, {
-        searchparams: queryString.stringify(queryParams, {
+        searchParams: queryString.stringify(queryParams, {
           arrayFormat: "bracket",
         }),
+        ...options,
       });
 
       yield first.body;
@@ -77,7 +79,10 @@ module.exports = class CanvasAPI {
         first.headers && first.headers.link && getNextUrl(first.headers.link);
 
       while (url) {
-        const response = await this.gotClient.get(url);
+        const response = await this.gotClient.get(url, {
+          prefixUrl: "",
+          ...options,
+        });
 
         yield response.body;
         url =
@@ -90,8 +95,12 @@ module.exports = class CanvasAPI {
     }
   }
 
-  async *_list(endpoint, queryParams = {}) {
-    for await (const page of this._listPaginated(endpoint, queryParams)) {
+  async *_list(endpoint, queryParams = {}, options = {}) {
+    for await (const page of this._listPaginated(
+      endpoint,
+      queryParams,
+      options
+    )) {
       if (!Array.isArray(page)) {
         throw new Error(
           `The function ".list()" should be used with endpoints that return arrays. Use "get()" or "listPaginated" instead with the endpoint ${endpoint}.`
@@ -120,5 +129,15 @@ module.exports = class CanvasAPI {
       .then((response) => {
         return response;
       });
+  }
+
+  listPaginated(endpoint, queryParams = {}, options = {}) {
+    return augmentGenerator(
+      this._listPaginated(endpoint, queryParams, options)
+    );
+  }
+
+  list(endpoint, queryParams = {}, options = {}) {
+    return augmentGenerator(this._list(endpoint, queryParams, options));
   }
 };
