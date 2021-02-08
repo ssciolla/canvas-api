@@ -17,12 +17,15 @@ npm i @kth/canvas-api
 ## Usage
 
 ```js
-import CanvasApi from '@kth/canvas-api'
+import CanvasApi from "@kth/canvas-api";
 // or, with CommonJS:
 // const CanvasApi = require("@kth/canvas-api");
 
 async function start() {
-  const canvas = new CanvasApi("https://kth.instructure.com/api/v1", "XXXX~xxxx");
+  const canvas = new CanvasApi(
+    "https://kth.instructure.com/api/v1",
+    "XXXX~xxxx"
+  );
   const { body } = await canvas.get("/accounts/1");
 }
 
@@ -34,7 +37,7 @@ start();
 ### Create a course
 
 ```js
-import CanvasApi from '@kth/canvas-api'
+import CanvasApi from "@kth/canvas-api";
 const canvas = new CanvasApi("https://kth.instructure.com/api/v1", "XXXX~xxxx");
 
 async function start() {
@@ -53,7 +56,7 @@ start();
 It is easier to use an array if you want to use JavaScript array methods (map, filter, etc.), when you want to retrieve the entire collection or when you know that the collection has a small size.
 
 ```js
-import CanvasApi from '@kth/canvas-api'
+import CanvasApi from "@kth/canvas-api";
 
 const courseId = "XXXX";
 const canvas = new CanvasApi("https://kth.instructure.com/api/v1", "XXXX~xxxx");
@@ -73,7 +76,7 @@ start();
 It is better to use an iterable if you don't want to fetch all the resources in a collection (in this case we are interested in **5 courses that...**)
 
 ```js
-import CanvasApi from '@kth/canvas-api'
+import CanvasApi from "@kth/canvas-api";
 const canvas = new CanvasApi("https://kth.instructure.com/api/v1", "XXXX~xxxx");
 
 function isSustainable(course) {
