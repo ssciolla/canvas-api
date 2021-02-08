@@ -20,11 +20,11 @@ function getNextUrl(linkHeader) {
 }
 
 module.exports = class CanvasAPI {
-  constructor(apiUrl, apiKey, options = {}) {
+  constructor(apiUrl, apiToken, options = {}) {
     this.gotClient = got.extend({
       prefixUrl: apiUrl,
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiToken}`,
       },
       responseType: "json",
       ...options,

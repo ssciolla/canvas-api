@@ -10,8 +10,10 @@
     "build": "npm test"
   },
   "exports": {
-    "require": "./src/index.js",
-    "import": "./esm/index.mjs"
+    ".": {
+      "require": "./src/index.js",
+      "import": "./esm/index.mjs"
+    }
   },
   "repository": {
     "type": "git",
@@ -24,14 +26,11 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@hapi/joi": "^15.1.0",
-    "debug": "^4.1.1",
     "form-data": "^2.5.0",
     "got": "^11.8.1",
     "query-string": "^6.13.1"
   },
   "devDependencies": {
-    "ajv": "^6.12.2",
     "ava": "^3.9.0",
     "create-test-server": "^3.0.1",
     "dotenv": "^8.2.0",
