@@ -41,7 +41,7 @@ module.exports = class CanvasAPI {
     try {
       const result = await this.gotClient(endpoint, {
         method,
-        body,
+        json: body,
         ...options,
       });
 

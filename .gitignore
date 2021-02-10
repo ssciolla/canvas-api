@@ -1,5 +1,6 @@
 node_modules
 .env
+.log
 
 # VS Code specific
 .vscode

@@ -126,6 +126,20 @@ test("List can handle pagination urls with query strings", async (t) => {
   t.is(result.value, "correct");
 });
 
+test("requestUrl parses the `body` as JSON automatically", async (t) => {
+  const server = await createTestServer();
+
+  server.post("/endpoint", (req, res) => {
+    res.send(req.body);
+  });
+
+  const canvas = new Canvas(server.url, "");
+
+  const { body } = await canvas.requestUrl("endpoint", "POST", { foo: "bar" });
+
+  t.deepEqual(body, { foo: "bar" });
+});
+
 test("sendSis fails when file is missing", async (t) => {
   const canvas = new Canvas("https://example.instructure.com", "Token");
   await t.throwsAsync(() =>
