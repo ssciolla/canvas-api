@@ -1,6 +1,6 @@
 const got = require("got");
 const queryString = require("query-string");
-const FormData = require("form-data");
+const FormData = require("formdata-node").default;
 const fs = require("fs");
 const { augmentGenerator } = require("./utils");
 
@@ -114,17 +114,18 @@ module.exports = class CanvasAPI {
   }
 
   async sendSis(endpoint, attachment, body = {}) {
-    const form = new FormData();
+    const fd = new FormData();
 
     for (const key in body) {
-      form.append(key, body[key]);
+      fd.set(key, body[key]);
     }
 
-    form.append("attachment", fs.createReadStream(attachment));
+    fd.set("attachment", fs.createReadStream(attachment));
 
     return this.gotClient
       .post(endpoint, {
-        body: form,
+        body: fd.stream,
+        headers: fd.headers,
       })
       .then((response) => {
         return response;

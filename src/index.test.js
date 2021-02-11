@@ -161,6 +161,26 @@ test("sendSis returns a parsed JSON object upon success", async (t) => {
   t.deepEqual(response.body, { key: "value" });
 });
 
+test("sendSis throws an error if timeout is over", async (t) => {
+  const server = await createTestServer();
+
+  server.post("/file", (req, res) => {
+    setTimeout(() => {
+      res.send({ key: "value" });
+    }, 2000);
+  });
+
+  const canvas = new Canvas(server.url, "", { timeout: 1 });
+  const tmp = tempy.file();
+  fs.writeFileSync(tmp, "hello world");
+
+  try {
+    await canvas.sendSis("file", tmp);
+  } catch (err) {
+    t.pass();
+  }
+});
+
 test("List throws an error if the endpoint response is not an array", async (t) => {
   const server = await createTestServer();
 
