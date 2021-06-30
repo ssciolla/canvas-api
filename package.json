@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "format": "prettier --write .",
-    "test": "npm run test:lint && ava",
+    "test": "npm run test:lint && jest",
     "test:lint": "eslint src && prettier --check .",
     "build": "npm test"
   },
@@ -26,15 +26,17 @@
   },
   "license": "MIT",
   "dependencies": {
+    "form-data-encoder": "^1.0.1",
     "formdata-node": "^3.5.4",
     "got": "^11.8.1",
     "query-string": "^6.13.1"
   },
   "devDependencies": {
-    "ava": "^3.9.0",
+    "@jest/globals": "^27.0.6",
     "create-test-server": "^3.0.1",
     "dotenv": "^8.2.0",
     "eslint": "^7.19.0",
+    "jest": "^27.0.6",
     "ora": "^5.0.0",
     "prettier": "^2.2.1",
     "tempy": "^0.3.0"

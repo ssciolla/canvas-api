@@ -1,8 +1,10 @@
 const got = require("got");
 const queryString = require("query-string");
-const { FormData } = require("formdata-node");
+const { FormData, fileFromPath } = require("formdata-node");
+const { Encoder } = require("form-data-encoder");
 const fs = require("fs");
 const { augmentGenerator } = require("./utils");
+const { Readable } = require("stream");
 
 function removeToken(err) {
   delete err.gotOptions;
@@ -120,12 +122,15 @@ module.exports = class CanvasAPI {
       fd.set(key, body[key]);
     }
 
-    fd.set("attachment", fs.createReadStream(attachment));
+    await fs.promises.access(attachment);
+    fd.set("attachment", await fileFromPath(attachment));
+
+    const encoder = new Encoder(fd);
 
     return this.gotClient
       .post(endpoint, {
-        body: fd.stream,
-        headers: fd.headers,
+        body: Readable.from(encoder),
+        headers: encoder.headers,
       })
       .then((response) => {
         return response;
