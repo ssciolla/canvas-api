@@ -1,6 +1,6 @@
 const got = require("got");
 const queryString = require("query-string");
-const FormData = require("formdata-node").default;
+const { FormData } = require("formdata-node");
 const fs = require("fs");
 const { augmentGenerator } = require("./utils");
 
