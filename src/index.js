@@ -3,10 +3,11 @@ const queryString = require("query-string");
 const { FormData, fileFromPath } = require("formdata-node");
 const { Encoder } = require("form-data-encoder");
 const fs = require("fs");
-const { augmentGenerator } = require("./utils");
 const { Readable } = require("stream");
+const { augmentGenerator } = require("./utils");
 
 function removeToken(err) {
+  /* eslint-disable no-param-reassign */
   delete err.gotOptions;
   delete err.response;
   return err;
@@ -81,6 +82,7 @@ module.exports = class CanvasAPI {
         first.headers && first.headers.link && getNextUrl(first.headers.link);
 
       while (url) {
+        // eslint-disable-next-line no-await-in-loop
         const response = await this.gotClient.get(url, {
           prefixUrl: "",
           ...options,
@@ -118,6 +120,7 @@ module.exports = class CanvasAPI {
   async sendSis(endpoint, attachment, body = {}) {
     const fd = new FormData();
 
+    // eslint-disable-next-line guard-for-in
     for (const key in body) {
       fd.set(key, body[key]);
     }
@@ -132,9 +135,7 @@ module.exports = class CanvasAPI {
         body: Readable.from(encoder),
         headers: encoder.headers,
       })
-      .then((response) => {
-        return response;
-      });
+      .then((response) => response);
   }
 
   listPaginated(endpoint, queryParams = {}, options = {}) {

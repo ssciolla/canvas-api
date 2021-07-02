@@ -33,9 +33,10 @@
   },
   "devDependencies": {
     "@jest/globals": "^27.0.6",
+    "@kth/eslint-config-kth": "^1.0.10",
     "create-test-server": "^3.0.1",
     "dotenv": "^8.2.0",
-    "eslint": "^7.19.0",
+    "eslint": "^7.29.0",
     "jest": "^27.0.6",
     "ora": "^5.0.0",
     "prettier": "^2.2.1",
