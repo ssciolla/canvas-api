@@ -1,5 +1,6 @@
+/* eslint-disable */
 require("dotenv").config();
-const Canvas = require("../index");
+const Canvas = require("../src/index");
 
 async function start() {
   console.log(
@@ -16,7 +17,7 @@ async function start() {
     process.env.CANVAS_API_TOKEN
   );
 
-  const { body } = await canvas.get("/accounts/1");
+  const { body } = await canvas.get("accounts/1");
   console.log("Showing response body...");
   console.log(body);
 }

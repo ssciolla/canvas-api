@@ -1,5 +1,6 @@
+/* eslint-disable */
 require("dotenv").config();
-const Canvas = require("../index");
+const Canvas = require("../src/index");
 const ora = require("ora");
 
 async function start() {
@@ -22,7 +23,7 @@ async function start() {
   const spinner = ora(`Getting courses... 0/${limit}`).start();
   try {
     let count = 0;
-    for await (const course of canvas.list("/accounts/1/courses")) {
+    for await (const course of canvas.list("accounts/1/courses")) {
       count++;
       if (count >= limit) {
         break;
