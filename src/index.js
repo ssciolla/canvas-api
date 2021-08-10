@@ -13,7 +13,7 @@ class CanvasApiError extends Error {
     this.name = gotError.name;
     this.options = {
       headers: gotError.options.headers,
-      url: gotError.options.url,
+      url: gotError.options.url.toString(),
     };
     this.options.headers.authorization = "[HIDDEN VALUE]";
 
