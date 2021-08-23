@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 const got = require("got");
 const queryString = require("query-string");
 const { FormData, fileFromPath } = require("formdata-node");
@@ -6,11 +7,29 @@ const fs = require("fs");
 const { Readable } = require("stream");
 const { augmentGenerator } = require("./utils");
 
-function removeToken(err) {
-  /* eslint-disable no-param-reassign */
-  delete err.gotOptions;
-  delete err.response;
-  return err;
+class CanvasApiError extends Error {
+  constructor(gotError) {
+    super(gotError.message);
+    this.name = gotError.name;
+    this.options = {
+      headers: gotError.options.headers,
+      url: gotError.options.url.toString(),
+    };
+    this.options.headers.authorization = "[HIDDEN VALUE]";
+
+    this.response = {
+      body: gotError.response.body,
+      headers: gotError.response.headers,
+      ip: gotError.response.ip,
+      retryCount: gotError.response.retryCount,
+      statusCode: gotError.response.statusCode,
+      statusMessage: gotError.response.statusMessage,
+    };
+
+    if (this.response.headers["content-type"]?.startsWith("text/html")) {
+      this.response.body = this.response.body?.slice(0, 200);
+    }
+  }
 }
 
 function getNextUrl(linkHeader) {
@@ -50,7 +69,7 @@ module.exports = class CanvasAPI {
 
       return result;
     } catch (err) {
-      throw removeToken(err);
+      throw new CanvasApiError(err);
     }
   }
 
@@ -64,7 +83,7 @@ module.exports = class CanvasAPI {
 
       return result;
     } catch (err) {
-      throw removeToken(err);
+      throw new CanvasApiError(err);
     }
   }
 
@@ -95,7 +114,7 @@ module.exports = class CanvasAPI {
           getNextUrl(response.headers.link);
       }
     } catch (err) {
-      throw removeToken(err);
+      throw new CanvasApiError(err);
     }
   }
 
