@@ -2,7 +2,8 @@
   "name": "@kth/canvas-api",
   "version": "3.2.0",
   "description": " Functions for communicating with Canvas LMS",
-  "main": "src/index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "format": "prettier --write .",
     "test": "npm run test:lint && jest",
@@ -10,12 +11,9 @@
     "build": "tsc",
     "prepublish": "npm run build"
   },
-  "exports": {
-    ".": {
-      "require": "./src/index.js",
-      "import": "./esm/index.mjs"
-    }
-  },
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/kth/canvas-api"
