@@ -1,103 +1,107 @@
-# Canvas API client
-
-Node.JS HTTP client based on [got](https://github.com/sindresorhus/got) for the [Canvas LMS API](https://canvas.instructure.com/doc/api/)
-
-[![Build Status](https://travis-ci.org/KTH/canvas-api.svg?branch=master)](https://travis-ci.org/KTH/canvas-api)
-
-1. [Install](#install)
-2. [Usage](#usage)
-3. [API reference](docs/API.md)
-
-## Install
+# Canvas API (for TypeScript and JavaScript)
 
 ```shell
 npm i @kth/canvas-api
 ```
 
-## Usage
+Node.JS HTTP client (for both TypeScript and JavaScript) based on [got](https://github.com/sindresorhus/got) for the [Canvas LMS API](https://canvas.instructure.com/doc/api/)
+
+## Getting Started
+
+First, generate a token by going to `«YOUR CANVAS INSTANCE»/profile/settings`. For example https://canvas.kth.se/profile/settings. Then you can do something like:
 
 ```js
-import CanvasApi from "@kth/canvas-api";
-// or, with CommonJS:
-// const CanvasApi = require("@kth/canvas-api");
+import CanvasApi from "@kth/canvas-api.ts";
 
-async function start() {
-  const canvas = new CanvasApi(
-    "https://kth.instructure.com/api/v1",
-    "XXXX~xxxx"
-  );
-  const { body } = await canvas.get("/accounts/1");
-}
+const canvas = new CanvasApi(
+  "https://canvas.kth.se/api/v1",
+  "«YOUR TOKEN HERE»"
+);
+const { body } = await canvas.get("accounts/1");
 
-start();
+console.log(body);
 ```
 
-## Examples
+## Concepts
 
-### Create a course
+### SIS Imports
 
-```js
-import CanvasApi from "@kth/canvas-api";
-const canvas = new CanvasApi("https://kth.instructure.com/api/v1", "XXXX~xxxx");
+This package implements one function to perform SIS Imports (i.e. call the [POST sis_imports] endpoint).
 
-async function start() {
-  const { body } = await canvas.requestUrl("/accounts/1/courses", "POST");
-  console.log(`Created! https://kth.test.instructure.com/courses/${body.id}`);
-}
-start();
+> Note: this is the only function that calls a **specific** endpoint. For other endpoints you should use `canvas.get`, `canvas.requestUrl`, `canvas.listItems` and `canvas.listPages`
+
+```ts
+
 ```
 
-→ [See the full API here](docs/API.md)
+[post sis_imports]: https://canvas.instructure.com/doc/api/sis_imports.html#method.sis_imports_api.create
 
-## Array vs iterable
+### `listItems` and `listPages`
 
-### Array example. Get a list of integration IDs of sections within a course
+This package does have pagination support which is offered in two methods: `listItems` and `listPages`. Let's see an example by using the [GET /accounts/1/courses] endpoint.
 
-It is easier to use an array if you want to use JavaScript array methods (map, filter, etc.), when you want to retrieve the entire collection or when you know that the collection has a small size.
-
-```js
-import CanvasApi from "@kth/canvas-api";
-
-const courseId = "XXXX";
-const canvas = new CanvasApi("https://kth.instructure.com/api/v1", "XXXX~xxxx");
-
-async function start() {
-  const sections = (
-    await canvas.list(`/courses/${courseId}/sections`).toArray()
-  ).map((section) => section.integration_id);
-
-  console.log(sections);
-}
-start();
-```
-
-### Iterable example. Get 5 courses that contain the word "sustain" in their name
-
-It is better to use an iterable if you don't want to fetch all the resources in a collection (in this case we are interested in **5 courses that...**)
+If you want to get all **pages** you can use `listPages`:
 
 ```js
-import CanvasApi from "@kth/canvas-api";
-const canvas = new CanvasApi("https://kth.instructure.com/api/v1", "XXXX~xxxx");
+const pages = canvas.listPages("accounts/1/courses");
 
-function isSustainable(course) {
-  return course.name.toLowerCase().indexOf("sustain") !== -1;
-}
-
-async function start() {
-  const courses = canvas.list("/accounts/1/courses");
-  const result = [];
-
-  for await (const course of courses) {
-    if (isSustainable(course)) {
-      result.push(course.name);
-    }
-
-    if (result.length >= 5) {
-      break;
-    }
+// Now `pages` is an iterator that goes through every page
+for await (const courses of pages) {
+  // `courses` is an array of courses in one page
+  for (const course of courses) {
+    console.log(course.id);
   }
-
-  console.log(result);
 }
-start();
 ```
+
+To avoid writing two `for` loops like above, you can call `listItems`, that iterates elements instead of pages. The following code does exactly the same as before:
+
+```js
+const courses = canvas.listItems("accounts/1/courses");
+
+// Now `courses` is an iterator that goes through every course
+for await (const course of courses) {
+  console.log(course.id);
+}
+```
+
+[get /accounts/1/courses]: https://canvas.instructure.com/doc/api/accounts.html#method.accounts.courses_api
+
+### Typescript support
+
+This package does not contain type definitions to the objects returned by Canvas. If you want such types, you need to define such types yourself and pass it as type parameter to the methods in this library.
+
+For example, to get typed "account" objects:
+
+```ts
+// First you define the "Account" type (or interface)
+// following the Canvas API docs: https://canvas.instructure.com/doc/api/accounts.html
+interface CanvasAccount {
+  id: number;
+  name: string;
+  workflow_state: string;
+}
+
+// Then, you can call our methods by passing your custom type as type parameter
+const { body } = await canvas.get<CanvasAccount>("accounts/1");
+
+console.log(body);
+```
+
+### Error handling
+
+// TODO
+
+## API Reference
+
+## Design philosophy
+
+1. **Do not implement every endpoint**. This package does **not** implement every endpoint in Canvas API This package also does not implement type definitions for objects returned by any endpoint nor definition for parameters. That would make it unmaintainable.
+
+   Exception: an endpoint is called exactly with the same parameters all the time.
+
+2. **Offer "lower-level" API** instead of trying to implement every possible feature, expose the "internals" to make it easy to extend.
+
+   Example: you can use `.client` to get the `Got` instance that is used internally. With such object, you have access to all options given by the library [got](https://github.com/sindresorhus/got)
+
+#
