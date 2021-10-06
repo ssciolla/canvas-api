@@ -10,8 +10,8 @@ import got, {
 import queryString from "query-string";
 import { FormData, fileFromPath } from "formdata-node";
 import { FormDataEncoder } from "form-data-encoder";
-import type { SisImportResponse } from "./sisImport";
 import fs from "fs/promises";
+import type { SisImportResponse } from "./sisImport";
 
 import { extendGenerator, ExtendedGenerator, CanvasApiError } from "./utils";
 

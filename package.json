@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "format": "prettier --write .",
+    "format": "eslint && prettier --write .",
     "test": "npm run test:lint && jest",
     "test:lint": "eslint src && prettier --check .",
     "build": "tsc",
@@ -35,6 +35,8 @@
     "@kth/eslint-config-kth": "^1.0.10",
     "@types/create-test-server": "^3.0.1",
     "@types/jest": "^27.0.2",
+    "@typescript-eslint/eslint-plugin": "^4.33.0",
+    "@typescript-eslint/parser": "^4.33.0",
     "create-test-server": "^3.0.1",
     "dotenv": "^8.2.0",
     "eslint": "^7.29.0",
