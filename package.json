@@ -33,12 +33,15 @@
   "devDependencies": {
     "@jest/globals": "^27.0.6",
     "@kth/eslint-config-kth": "^1.0.10",
+    "@types/create-test-server": "^3.0.1",
+    "@types/jest": "^27.0.2",
     "create-test-server": "^3.0.1",
     "dotenv": "^8.2.0",
     "eslint": "^7.29.0",
     "jest": "^27.0.6",
     "ora": "^5.0.0",
     "prettier": "^2.2.1",
-    "tempy": "^0.3.0"
+    "tempy": "^0.3.0",
+    "ts-jest": "^27.0.5"
   }
 }

@@ -181,13 +181,13 @@ export default class CanvasAPI {
       queryParams,
       options
     )) {
-      if (!Array.isArray(page)) {
+      if (!Array.isArray(page.body)) {
         throw new Error(
-          `The function ".list()" should be used with endpoints that return arrays. Use "get()" or "listPaginated" instead with the endpoint ${endpoint}.`
+          `The function ".listItems()" should be used with endpoints that return arrays. Use "get()" or "listPages" instead with the endpoint [${endpoint}].`
         );
       }
 
-      for (const element of page) {
+      for (const element of page.body) {
         yield element;
       }
     }
@@ -197,7 +197,7 @@ export default class CanvasAPI {
    * Performs a paginated get request. Returns an iterator that traverse
    * through every element of each thing returned by every page.
    *
-   * If you need the pages instead of the elements, use `listPaginated` instead
+   * If you need the pages instead of the elements, use `listPages` instead
    */
   listItems<T>(
     endpoint: string,
