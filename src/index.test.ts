@@ -2,7 +2,7 @@ import { expect, test } from "@jest/globals";
 import createTestServer from "create-test-server";
 import fs from "fs";
 import tempy from "tempy";
-import Canvas from "./index"
+import Canvas from "./index";
 
 test("Token is correctly stripped", async () => {
   const canvas = new Canvas(
@@ -47,7 +47,7 @@ test('URLs are correctly "resolved"', async () => {
   await server.close();
 });
 
-test("List returns a correct iterable", async () => {
+test("listItems returns a correct iterable", async () => {
   const server = await createTestServer();
 
   server.get("/something", (req, res) => {
@@ -71,7 +71,7 @@ test("List returns a correct iterable", async () => {
   await server.close();
 });
 
-test("List returns an Augmented iterable", async () => {
+test("listItems returns an Augmented iterable", async () => {
   const server = await createTestServer();
 
   server.get("/something", (req, res) => {
@@ -91,7 +91,7 @@ test("List returns an Augmented iterable", async () => {
   await server.close();
 });
 
-test('List ignores non-"rel=next" link headers', async () => {
+test('listItems ignores non-"rel=next" link headers', async () => {
   const server = await createTestServer();
 
   server.get("/something", (req, res) => {
@@ -113,7 +113,7 @@ test('List ignores non-"rel=next" link headers', async () => {
   await server.close();
 });
 
-test("List can handle pagination urls with query strings", async () => {
+test("listItems can handle pagination urls with query strings", async () => {
   const server = await createTestServer();
 
   server.get("/something", (req, res) => {
@@ -153,12 +153,11 @@ test("requestUrl parses the `body` as JSON automatically", async () => {
   await server.close();
 });
 
-/*
-test.skip("sendSis fails when file is missing", async () => {
+test("sisImport fails when file is missing", async () => {
   const canvas = new Canvas("https://example.instructure.com", "Token");
 
   try {
-    await canvas.sisImport("some-endpoint", "non-existing-file");
+    await canvas.sisImport("non-existing-file");
   } catch (err) {
     expect(err).toMatchInlineSnapshot(
       `[Error: ENOENT: no such file or directory, access 'non-existing-file']`
@@ -166,23 +165,23 @@ test.skip("sendSis fails when file is missing", async () => {
   }
 });
 
-test("sendSis returns a parsed JSON object upon success", async () => {
+test("sisImport returns a parsed JSON object upon success", async () => {
   const server = await createTestServer();
 
-  server.post("/file", (req, res) => {
+  server.post("/accounts/1/sis_import", (req, res) => {
     res.send({ key: "value" });
   });
 
-  const canvas = new Canvas(server.url, "");
+  const canvas = new Canvas(server.url ?? "", "");
   const tmp = tempy.file();
   fs.writeFileSync(tmp, "hello world");
-  const response = await canvas.sendSis("file", tmp);
+  const response = await canvas.sisImport(tmp);
   expect(response.body).toEqual({ key: "value" });
 
   await server.close();
 });
 
-test("sendSis throws an error if timeout is over", async () => {
+test("sisImport throws an error if timeout is over", async () => {
   const server = await createTestServer();
 
   server.post("/file", (req, res) => {
@@ -191,12 +190,12 @@ test("sendSis throws an error if timeout is over", async () => {
     }, 2000);
   });
 
-  const canvas = new Canvas(server.url, "", { timeout: 1 });
+  const canvas = new Canvas(server.url ?? "", "", { timeout: 1 });
   const tmp = tempy.file();
   fs.writeFileSync(tmp, "hello world");
 
   try {
-    await canvas.sendSis("file", tmp);
+    await canvas.sisImport(tmp);
   } catch (err) {
     expect(err).toMatchInlineSnapshot(
       `[TimeoutError: Timeout awaiting 'request' for 1ms]`
@@ -206,21 +205,19 @@ test("sendSis throws an error if timeout is over", async () => {
   }
 });
 
-
-test("List throws an error if the endpoint response is not an array", async () => {
+test("listItems() throws an error if the endpoint response is not an array", async () => {
   const server = await createTestServer();
 
   server.get("/not-a-list", (req, res) => {
     res.send({ x: 1 });
   });
 
-  const canvas = new Canvas(server.url, "");
-  const it = canvas.list("not-a-list");
+  const canvas = new Canvas(server.url ?? "", "");
+  const it = canvas.listItems("not-a-list");
 
   await expect(() => it.next()).rejects.toThrowErrorMatchingInlineSnapshot(
-    `"The function \\".list()\\" should be used with endpoints that return arrays. Use \\"get()\\" or \\"listPaginated\\" instead with the endpoint not-a-list."`
+    `"The function \\".listItems()\\" should be used with endpoints that return arrays. Use \\"get()\\" or \\"listPages\\" instead with the endpoint [not-a-list]."`
   );
 
   await server.close();
 });
-*/
