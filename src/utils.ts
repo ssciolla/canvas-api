@@ -44,7 +44,7 @@ export class CanvasApiError extends Error {
 
   constructor(gotError: HTTPError) {
     super(gotError.message);
-    this.name = gotError.name;
+    this.name = "CanvasApiError";
     this.options = {
       headers: gotError.options.headers,
       url: gotError.options.url.toString(),
