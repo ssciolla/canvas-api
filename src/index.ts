@@ -8,9 +8,10 @@ import got, {
   HTTPError,
 } from "got";
 import queryString from "query-string";
-import { FormData } from "formdata-node";
+import { FormData, fileFromPath } from "formdata-node";
 import { FormDataEncoder } from "form-data-encoder";
 import type { SisImportResponse } from "./sisImport";
+import fs from "fs/promises";
 
 import { extendGenerator, ExtendedGenerator, CanvasApiError } from "./utils";
 
@@ -89,12 +90,12 @@ export default class CanvasAPI {
    * Read more about the sis_imports endpoint: https://canvas.instructure.com/doc/api/sis_imports.html#method.sis_imports_api.create
    */
   async sisImport(
-    attachment: Readable,
-    fileName = "attachment.csv",
+    attachment: string,
     options: OptionsOfJSONResponseBody = {}
   ): Promise<Response<SisImportResponse>> {
     const fd = new FormData();
-    fd.set("attachment", attachment, fileName);
+    await fs.access(attachment);
+    fd.set("attachment", await fileFromPath(attachment));
     const formDataEncoder = new FormDataEncoder(fd);
 
     return this.gotClient
