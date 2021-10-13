@@ -87,6 +87,11 @@ export default class CanvasAPI {
     body: Record<string, unknown> = {},
     options: OptionsOfJSONResponseBody = {}
   ): Promise<Response<T>> {
+    process.emitWarning(
+      "Method `requestUrl` will soon stop working. " +
+        "Use `request` (with same parameters) instead",
+      "DeprecationWarning"
+    );
     return this.request(endpoint, method, body, options);
   }
 
@@ -125,6 +130,10 @@ export default class CanvasAPI {
     attachment: string,
     body: Record<string, unknown> = {}
   ): Promise<Response<T>> {
+    process.emitWarning(
+      "Method `sendSis` will stop working soon. Use `sisImport` or `request`",
+      "DeprecationWarning"
+    );
     const fd = new FormData();
 
     // eslint-disable-next-line guard-for-in
@@ -227,6 +236,11 @@ export default class CanvasAPI {
     queryParams: Record<string, unknown> = {},
     options: OptionsOfJSONResponseBody = {}
   ): ExtendedGenerator<T> {
+    process.emitWarning(
+      "Method `listPaginated` will soon stop working. Please use `listPages` instead. " +
+        "Note that `listPages` returns `Response` objects instead of just the body.",
+      "DeprecationWarning"
+    );
     return extendGenerator(this._listPaginated(endpoint, queryParams, options));
   }
 
@@ -274,6 +288,11 @@ export default class CanvasAPI {
     queryParams: Record<string, unknown> = {},
     options: OptionsOfJSONResponseBody = {}
   ): ExtendedGenerator<T> {
+    process.emitWarning(
+      "Method `list` will soon stop working. " +
+        "Please use `listItems` instead with the same arguments",
+      "DeprecationWarning"
+    );
     return this.listItems(endpoint, queryParams, options);
   }
 }
