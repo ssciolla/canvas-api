@@ -81,6 +81,18 @@ export default class CanvasAPI {
   }
 
   /**
+   * @deprecated Use `request` instead (with the same parameters)
+   */
+  async requestUrl<T>(
+    endpoint: string,
+    method: Method,
+    body: Record<string, unknown> = {},
+    options: OptionsOfJSONResponseBody = {}
+  ): Promise<Response<T>> {
+    return this.request(endpoint, method, body, options);
+  }
+
+  /**
    * Imports SIS Data from a CSV file. The request will be made to
    * /accounts/1/sis_import.
    *
@@ -105,6 +117,32 @@ export default class CanvasAPI {
         ...options,
       })
       .catch(errorHandler);
+  }
+
+  /**
+   * @deprecated. Use `sisImport` or `request` instead
+   */
+  async sendSis<T>(
+    endpoint: string,
+    attachment: string,
+    body: Record<string, unknown> = {}
+  ): Promise<Response<T>> {
+    const fd = new FormData();
+
+    // eslint-disable-next-line guard-for-in
+    for (const key in body) {
+      fd.set(key, body[key]);
+    }
+
+    await fs.access(attachment);
+    fd.set("attachment", await fileFromPath(attachment));
+
+    const encoder = new FormDataEncoder(fd);
+
+    return this.gotClient.post<T>(endpoint, {
+      body: Readable.from(encoder),
+      headers: encoder.headers,
+    });
   }
 
   /**
@@ -170,6 +208,30 @@ export default class CanvasAPI {
     return extendGenerator(this._listPages(endpoint, queryParams, options));
   }
 
+  // Note: drop this function when listPaginated is also dropped
+  private async *_listPaginated<T>(
+    endpoint: string,
+    queryParams: Record<string, unknown> = {},
+    options: OptionsOfJSONResponseBody = {}
+  ): AsyncGenerator<T> {
+    for await (const page of this._listPages<T>(
+      endpoint,
+      queryParams,
+      options
+    )) {
+      yield page.body;
+    }
+  }
+
+  /** @deprecated. Use `listPages` instead */
+  listPaginated<T>(
+    endpoint: string,
+    queryParams: Record<string, unknown> = {},
+    options: OptionsOfJSONResponseBody = {}
+  ): ExtendedGenerator<T> {
+    return extendGenerator(this._listPaginated(endpoint, queryParams, options));
+  }
+
   // Note: the public version of this method returns an
   // ExtendedGenerator instead of a normal AsyncGenerator
   private async *_listItems<T>(
@@ -207,6 +269,17 @@ export default class CanvasAPI {
   ): ExtendedGenerator<T> {
     return extendGenerator(this._listItems(endpoint, queryParams, options));
   }
+
+  /** @deprecated Use "listItems" instead */
+  list<T>(
+    endpoint: string,
+    queryParams: Record<string, unknown> = {},
+    options: OptionsOfJSONResponseBody = {}
+  ): ExtendedGenerator<T> {
+    return this.listItems(endpoint, queryParams, options);
+  }
 }
+
+module.exports = CanvasAPI;
 
 export { CanvasApiError, ExtendedGenerator };
