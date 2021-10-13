@@ -80,9 +80,7 @@ export default class CanvasAPI {
     }).catch(errorHandler);
   }
 
-  /**
-   * @deprecated Use `request` instead (with the same parameters)
-   */
+  /** @deprecated Use `request` instead */
   async requestUrl<T>(
     endpoint: string,
     method: Method,
