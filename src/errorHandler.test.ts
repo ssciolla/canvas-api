@@ -1,6 +1,5 @@
 import createTestServer from "create-test-server";
-import Canvas from "./index";
-import { CanvasApiError } from "./utils";
+import Canvas, { CanvasApiError } from "./index";
 
 test("errorHandler converts HTTPError to CanvasApiError", async () => {
   const server = await createTestServer();
